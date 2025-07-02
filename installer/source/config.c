@@ -34,6 +34,7 @@ static void set_config_defaults(struct configuration *config) {
   config->block_updates = DEFAULT_BLOCK_UPDATES;
   config->disable_aslr = DEFAULT_DISABLE_ASLR;
   config->enable_browser = DEFAULT_ENABLE_BROWSER;  
+  config->kernel_clock = DEFAULT_KERNEL_CLOCK; 
   config->nobd_patches = DEFAULT_NOBD_PATCHES;
   config->upload_prx = DEFAULT_UPLOAD_PRX;
   config->enable_plugins = DEFAULT_ENABLE_PLUGINS;
