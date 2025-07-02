@@ -3,9 +3,6 @@
 
 #define TARGET_ID_SIZE 4 // eg. 0x84
 
-typedef unsigned int uid_t;
-typedef unsigned int gid_t;
-
 struct configuration {
   int exploit_fixes;
   int mmap_patches;
