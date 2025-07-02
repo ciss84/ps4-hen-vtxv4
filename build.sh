@@ -10,46 +10,18 @@ if [ "$(id -u)" -eq 0 ] && grep -qi ubuntu /etc/os-release; then
 fi
 
 cd kpayload
-make clean
 make
 cd ..
 
 mkdir -p tmp
 cd tmp
-
-# known bundled plugins
-PRX_FILES="plugin_bootloader.prx plugin_loader.prx plugin_server.prx"
-
-SKIP_DOWNLOAD=false
-if [ -f plugins.zip ]; then
-  SKIP_DOWNLOAD=true
-else
-  for prx in "${PRX_FILES[@]}"; do
-    if [ -f "$prx" ]; then
-      SKIP_DOWNLOAD=true
-      break
-    fi
-  done
-fi
-
-if [ "$SKIP_DOWNLOAD" = false ]; then
-  f="plugins.zip"
-  rm -f $f
-  curl -fLJO https://github.com/ciss84/ps4-hen-plugins/releases/download/b128/plugins.zip
-  unzip $f
-fi
-
-# need to use translation units to force rebuilds
-# including as headers doesn't do it
-for file in *.prx; do
-  echo $file
-  xxd -i "$file" | sed 's/^unsigned /static const unsigned /' > "../installer/source/${file}.inc.c"
-done
-
+curl -fLJO https://github.com/ciss84/ps4-hen-plugins/releases/download/b128/plugins.zip
+unzip plugins.zip
+for file in *.prx; do xxd -i "$file" > "../installer/include/${file}.inc"; done
 cd ..
+rm -rf tmp
 
 cd installer
-make clean
 make
 cd ..
 
