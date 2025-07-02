@@ -3,6 +3,8 @@
 
 #define TARGET_ID_SIZE 4 // eg. 0x84
 
+#include "common.h"
+
 struct configuration {
   int exploit_fixes;
   int mmap_patches;
