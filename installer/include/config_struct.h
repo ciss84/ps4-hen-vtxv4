@@ -17,4 +17,18 @@ struct configuration {
   char target_id[TARGET_ID_SIZE + 1]; // Add null term
 };
 
+struct Backup_Jail bkJail;
+
+struct Backup_Jail
+{
+    struct prison* cr_prison;
+    uid_t cr_uid;
+    uid_t cr_ruid;
+    gid_t cr_rgid;
+    gid_t cr_groups;
+
+    struct vnode* fd_jdir;
+    struct vnode* fd_rdir;
+};
+
 #endif

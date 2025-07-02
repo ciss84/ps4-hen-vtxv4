@@ -24,7 +24,7 @@ void write_blob(const char *path, const void *blob, const size_t blobsz) {
   }
 }
 
-void kill_proc(const char *proc) {
+/*void kill_proc(const char *proc) {
   if (!proc) {
     return;
   }
@@ -34,6 +34,27 @@ void kill_proc(const char *proc) {
     const int k = kill(party, SIGKILL);
     printf_debug("sent SIGKILL(%d) to %s(%d)\n", k, proc, party);
   }
+}*/
+
+void RestoreJail(struct proc* proc, struct Backup_Jail jail)
+{
+    if(proc)
+    {
+        struct ucred* cred = proc->p_ucred;
+        struct filedesc* fd = proc->p_fd;
+
+        if(!cred || !fd)
+            return;
+
+        cred->cr_prison = jail.cr_prison;
+        cred->cr_uid = jail.cr_uid;
+        cred->cr_ruid = jail.cr_ruid;
+        cred->cr_rgid = jail.cr_rgid;
+        cred->cr_groups[0] = jail.cr_groups;
+
+        fd->fd_jdir = jail.fd_jdir;
+        fd->fd_rdir = jail.fd_rdir;
+    }
 }
 
 void block_updates(void) {

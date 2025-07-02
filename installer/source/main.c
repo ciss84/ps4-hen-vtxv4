@@ -183,26 +183,29 @@ int _main(struct thread *td) {
 
   //printf_notification("Welcome to HEN %s", VERSION);
   printf_notification3("/user/data/icon0.png", "HEN-Vtx-" VERSION);
+
+	//Restore the original jail for the current Process.
+	RestoreJail(td->td_proc, bkJail);
   
-  const bool kill_ui = true;
+  /*const bool kill_ui = true;
   const int sleep_sec = kill_ui ? 5 : 1;
   const int u_to_sec = 1000 * 1000;
   const char *proc = kill_ui ? "SceShellUI" : NULL;
   if (kill_ui) {
     usleep(sleep_sec * u_to_sec);
     printf_notification3("/user/data/icon0.png", "HEN will restart %s\nin %d seconds...", proc, sleep_sec);
-  }
+  }*/
 
 #ifdef DEBUG_SOCKET
   printf_debug("Closing socket...\n");
   SckClose(DEBUG_SOCK);
 #endif
 
-  usleep(sleep_sec * u_to_sec);
+  /*usleep(sleep_sec * u_to_sec);
   // this was chosen because SceShellCore will try to restart this daemon if it crashes
   // or manually killed in this case
   kill_proc("ScePartyDaemon");
-  kill_proc(proc);
+  kill_proc(proc);*/
 
   return 0;
 }
