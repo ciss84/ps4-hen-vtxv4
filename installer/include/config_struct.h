@@ -8,6 +8,8 @@ struct configuration {
   int mmap_patches;
   int block_updates;
   int disable_aslr;
+  int enable_browser;
+  int kernel_clock;  
   int nobd_patches;
   int skip_patches;
   int upload_prx;
