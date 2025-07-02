@@ -3,8 +3,6 @@
 
 #define TARGET_ID_SIZE 4 // eg. 0x84
 
-#include "common.h"
-
 struct configuration {
   int exploit_fixes;
   int mmap_patches;
@@ -24,10 +22,10 @@ struct Backup_Jail bkJail;
 struct Backup_Jail
 {
     struct prison* cr_prison;
-    uid_t cr_uid;
-    uid_t cr_ruid;
-    gid_t cr_rgid;
-    gid_t cr_groups;
+    int cr_uid;
+    int cr_ruid;
+    int cr_rgid;
+    int cr_groups;
 
     struct vnode* fd_jdir;
     struct vnode* fd_rdir;

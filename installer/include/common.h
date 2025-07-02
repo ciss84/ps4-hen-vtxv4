@@ -3,9 +3,6 @@
 
 #include <types.h>
 
-typedef unsigned int uid_t;
-typedef unsigned int gid_t;
-
 void write_blob(const char *path, const void *blob, const size_t blobsz);
 void kill_proc(const char *proc);
 void block_updates(void);
