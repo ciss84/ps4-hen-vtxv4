@@ -3,7 +3,6 @@
 #define DEBUG_PORT 9023
 
 #include <ps4.h>
-#include "ImgCache.h"
 #include <stdbool.h>
 
 #include "common.h"
@@ -12,19 +11,6 @@
 #include "path.h"
 #include "plugins.h"
 #include "version.h"
-
-void writeCacheImg()
-{
-size_t len = 0;
-unsigned char* img = base64_decode(CacheImg, sizeof(CacheImg), &len);
-if (len != 0)
-{
-int folder = open("/user/data/icon0.png", O_WRONLY | O_CREAT | O_TRUNC, 0777);
-write(folder, img, len);
-close(folder);
-free(img);
-}
-}
 
 // TODO: Where should this go? `common.c` doesn't feel right
 // Apply target ID spoofing if configured
@@ -117,12 +103,12 @@ int _main(struct thread *td) {
     return -1;
   }
 
+  // Jailbreak the process
+  jailbreak();
+
   // Apply all HEN kernel patches
   install_patches();
-  initSysUtil();
-  kernel_clock(14861963);
-  writeCacheImg();
-  
+
   // Initialize config
   struct configuration config;
   init_config(&config);
@@ -166,8 +152,7 @@ int _main(struct thread *td) {
     upload_prx_to_disk();
   }
 
-  //printf_notification("Welcome to HEN %s", VERSION);
-  printf_notification3("/user/data/icon0.png", "Vtx-Hen-" VERSION);
+  printf_notification("Welcome to HEN %s", VERSION);
 
   const bool kill_ui = true;
   const int sleep_sec = kill_ui ? 5 : 1;
