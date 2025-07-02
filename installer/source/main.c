@@ -152,6 +152,16 @@ int _main(struct thread *td) {
     disable_aslr();
   }
 
+  if (config.enable_browser) {
+    printf_debug("Enable Browser...\n");
+    enable_browser();
+  }
+
+  if (config.kernel_clock) {
+    printf_debug("Enable kernel clock...\n");
+    kernel_clock(14861963);
+  }
+
   if (config.nobd_patches) {
     printf_debug("Installing NoBD patches...\n");
     no_bd_patch();
