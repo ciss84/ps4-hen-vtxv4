@@ -298,11 +298,11 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
     // dummy process to load server prx into
     struct dynlib_load_prx_args my_args = {};
     int handle = 0;
-    /*if (isPartyDaemon)
+    if (isPartyDaemon)
     {
-      my_args.prx_path = PRX_SERVER_PATH;
+      //my_args.prx_path = PRX_SERVER_PATH;
     }
-    else*/ if (isShellUI)
+    else if (isShellUI)
     {
       my_args.prx_path = PRX_MONO_PATH;
     }
