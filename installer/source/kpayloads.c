@@ -12,10 +12,6 @@
 #define patch_macro(x)                                                                           \
   kernel_base = &((uint8_t *)__readmsr(0xC0000082))[-K##x##_XFAST_SYSCALL];                      \
   kernel_ptr = (uint8_t *)kernel_base;                                                           \
-  uart_patch = &kernel_ptr[K##x##_UART_PATCH];                                                   \
-  /* is_diag_process_patch = &kernel_ptr[K##x##_IS_DIAG_PROCESS_PATCH]; */                       \
-  /* allow_system_level_logging_patch = &kernel_ptr[K##x##_ALLOW_SYSTEM_LEVEL_LOGGING_PATCH]; */ \
-  /* allow_coredump_patch = &kernel_ptr[K##x##_ALLOW_COREDUMP_PATCH]; */                         \
   copyin_patch_1 = &kernel_ptr[K##x##_COPYIN_PATCH_1];                                           \
   copyin_patch_2 = &kernel_ptr[K##x##_COPYIN_PATCH_2];                                           \
   copyout_patch_1 = &kernel_ptr[K##x##_COPYOUT_PATCH_1];                                         \
@@ -24,12 +20,14 @@
   copyinstr_patch_2 = &kernel_ptr[K##x##_COPYINSTR_PATCH_2];                                     \
   copyinstr_patch_3 = &kernel_ptr[K##x##_COPYINSTR_PATCH_3];                                     \
   setlogin_patch = &kernel_ptr[K##x##_SETLOGIN_PATCH];                                           \
+  Patch_setuid = &kernel_ptr[K##x##_PATCH_SETUID];                                               \
+  dispsw_patch = &kernel_ptr[K##x##_DIPSW_PATCH];                                                \
+  debug_settings_error_patch_1 = &kernel_ptr[K##x##_DEBUG_SETTINGS_ERROR_PATCH_1];               \
+  debug_settings_error_patch_2 = &kernel_ptr[K##x##_DEBUG_SETTINGS_ERROR_PATCH_2];               \
   pfs_signature_check_patch = &kernel_ptr[K##x##_PFS_SIGNATURE_CHECK_PATCH];                     \
   debug_rif_patch_1 = &kernel_ptr[K##x##_DEBUG_RIF_PATCH_1];                                     \
   debug_rif_patch_2 = &kernel_ptr[K##x##_DEBUG_RIF_PATCH_2];                                     \
-  debug_settings_error_patch_1 = &kernel_ptr[K##x##_DEBUG_SETTINGS_ERROR_PATCH_1];               \
-  debug_settings_error_patch_2 = &kernel_ptr[K##x##_DEBUG_SETTINGS_ERROR_PATCH_2];               \
-  /* mount_patch = &kernel_ptr[K##x##_MOUNT_PATCH]; */                                           \
+  uart_patch = &kernel_ptr[K##x##_UART_PATCH];                                                   \
   depth_limit_patch = &kernel_ptr[K##x##_DEPTH_LIMIT_PATCH];
 
 #define install_macro(x)                                                    \
@@ -70,10 +68,6 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   uint8_t *kmem;
 
   // Pointers to be assigned in build_kpayload macro
-  uint8_t *uart_patch;
-  // uint8_t *is_diag_process_patch;
-  // uint8_t *allow_system_level_logging_patch;
-  // uint8_t *allow_coredump_patch;
   uint8_t *copyin_patch_1;
   uint8_t *copyin_patch_2;
   uint8_t *copyout_patch_1;
@@ -82,12 +76,21 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   uint8_t *copyinstr_patch_2;
   uint8_t *copyinstr_patch_3;
   uint8_t *setlogin_patch;
+  //uint8_t *panic_patch;
+  uint8_t *Patch_setuid;
+  uint8_t *dispsw_patch;  
+  uint8_t *debug_settings_error_patch_1;
+  uint8_t *debug_settings_error_patch_2;
   uint8_t *pfs_signature_check_patch;
   uint8_t *debug_rif_patch_1;
   uint8_t *debug_rif_patch_2;
-  uint8_t *debug_settings_error_patch_1;
-  uint8_t *debug_settings_error_patch_2;
-  // uint8_t *mount_patch;
+  //uint8_t *enable_ptrace_patch1;
+  //uint8_t *sys_dynlib_dlsym_patch1;
+  //uint8_t *dynlib_patch_1;
+  //uint8_t *dynlib_patch_2;
+  //uint8_t *enable_ptrace_patch2; 
+  //uint8_t *enable_debug_log_patch;  
+  uint8_t *uart_patch;  
   uint8_t *depth_limit_patch;
 
   uint16_t fw_version = args->kpayload_firmware_info->fw_version;
@@ -150,7 +153,7 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
 	kmem[1] = 0x90;
 	kmem[2] = 0x90;
 	kmem[3] = 0x90;
-	kmem[4] = 0x90;
+	kmem[4] = 0x90;*/
   
   // Patch setuid: Don't run kernel exploit more than once/privilege escalation
 	kmem = (uint8_t *)Patch_setuid;
@@ -158,7 +161,7 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
 	kmem[1] = 0x00;
 	kmem[2] = 0x00;
 	kmem[3] = 0x00;
-	kmem[4] = 0x00;*/
+	kmem[4] = 0x00;
 	//kmem = (uint8_t *)target_id;
 	//kmem[0] = 0x82;  
 	kmem = (uint8_t *)dispsw_patch;
