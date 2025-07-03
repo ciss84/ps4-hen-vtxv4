@@ -326,11 +326,10 @@ static int kpayload_install_payload(struct thread *td, struct kpayload_install_p
   // Use "kmem" for all patches
   uint8_t *kmem;
 
-	struct ucred *cred;
-	struct filedesc *fd;
-
-	fd = td->td_proc->p_fd;
-	cred = td->td_proc->p_ucred;
+  struct filedesc *fd;
+  struct ucred *cred;
+  fd = td->td_proc->p_fd;
+  cred = td->td_proc->p_ucred;
 
   // Pointers to be assigned in build_kpayload macro
   void *kernel_pmap_store;
@@ -374,10 +373,10 @@ static int kpayload_install_payload(struct thread *td, struct kpayload_install_p
     return -1;
   }
 
-	cred->cr_uid = 0;
-	cred->cr_ruid = 0;
-	cred->cr_rgid = 0;
-	cred->cr_groups[0] = 0;
+  cred->cr_uid = 0;
+  cred->cr_ruid = 0;
+  cred->cr_rgid = 0;
+  cred->cr_groups[0] = 0;
 
 	cred->cr_prison = *prison0_addr;
 	fd->fd_rdir = fd->fd_jdir = *rootvnode_addr;
