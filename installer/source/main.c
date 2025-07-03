@@ -121,9 +121,6 @@ int _main(struct thread *td) {
     return -1;
   }
 
-  // Jailbreak the process
-  jailbreak();
-
   // Apply all HEN kernel patches
   install_patches();
   writeCacheImg();
