@@ -24,7 +24,7 @@ void write_blob(const char *path, const void *blob, const size_t blobsz) {
   }
 }
 
-/*void kill_proc(const char *proc) {
+void kill_proc(const char *proc) {
   if (!proc) {
     return;
   }
@@ -34,9 +34,9 @@ void write_blob(const char *path, const void *blob, const size_t blobsz) {
     const int k = kill(party, SIGKILL);
     printf_debug("sent SIGKILL(%d) to %s(%d)\n", k, proc, party);
   }
-}*/
+}
 
-void RestoreJail(struct proc* proc, struct Backup_Jail jail)
+/*void RestoreJail(struct proc* proc, struct Backup_Jail jail)
 {
     if(proc)
     {
@@ -55,7 +55,7 @@ void RestoreJail(struct proc* proc, struct Backup_Jail jail)
         fd->fd_jdir = jail.fd_jdir;
         fd->fd_rdir = jail.fd_rdir;
     }
-}
+}*/
 
 void block_updates(void) {
   // Delete existing updates/blocker and recreate

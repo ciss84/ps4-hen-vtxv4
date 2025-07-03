@@ -17,7 +17,7 @@ struct configuration {
   char target_id[TARGET_ID_SIZE + 1]; // Add null term
 };
 
-struct Backup_Jail bkJail;
+/*struct Backup_Jail bkJail;
 
 struct Backup_Jail
 {
@@ -29,6 +29,6 @@ struct Backup_Jail
 
     struct vnode* fd_jdir;
     struct vnode* fd_rdir;
-};
+};*/
 
 #endif
