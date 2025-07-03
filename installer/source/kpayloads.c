@@ -12,6 +12,10 @@
 #define patch_macro(x)                                                                           \
   kernel_base = &((uint8_t *)__readmsr(0xC0000082))[-K##x##_XFAST_SYSCALL];                      \
   kernel_ptr = (uint8_t *)kernel_base;                                                           \
+  uart_patch = &kernel_ptr[K##x##_UART_PATCH];                                                   \
+  /* is_diag_process_patch = &kernel_ptr[K##x##_IS_DIAG_PROCESS_PATCH]; */                       \
+  /* allow_system_level_logging_patch = &kernel_ptr[K##x##_ALLOW_SYSTEM_LEVEL_LOGGING_PATCH]; */ \
+  /* allow_coredump_patch = &kernel_ptr[K##x##_ALLOW_COREDUMP_PATCH]; */                         \
   copyin_patch_1 = &kernel_ptr[K##x##_COPYIN_PATCH_1];                                           \
   copyin_patch_2 = &kernel_ptr[K##x##_COPYIN_PATCH_2];                                           \
   copyout_patch_1 = &kernel_ptr[K##x##_COPYOUT_PATCH_1];                                         \
@@ -20,14 +24,12 @@
   copyinstr_patch_2 = &kernel_ptr[K##x##_COPYINSTR_PATCH_2];                                     \
   copyinstr_patch_3 = &kernel_ptr[K##x##_COPYINSTR_PATCH_3];                                     \
   setlogin_patch = &kernel_ptr[K##x##_SETLOGIN_PATCH];                                           \
-  Patch_setuid = &kernel_ptr[K##x##_PATCH_SETUID];                                               \
-  dispsw_patch = &kernel_ptr[K##x##_DIPSW_PATCH];                                                \
-  debug_settings_error_patch_1 = &kernel_ptr[K##x##_DEBUG_SETTINGS_ERROR_PATCH_1];               \
-  debug_settings_error_patch_2 = &kernel_ptr[K##x##_DEBUG_SETTINGS_ERROR_PATCH_2];               \
   pfs_signature_check_patch = &kernel_ptr[K##x##_PFS_SIGNATURE_CHECK_PATCH];                     \
   debug_rif_patch_1 = &kernel_ptr[K##x##_DEBUG_RIF_PATCH_1];                                     \
   debug_rif_patch_2 = &kernel_ptr[K##x##_DEBUG_RIF_PATCH_2];                                     \
-  uart_patch = &kernel_ptr[K##x##_UART_PATCH];                                                   \
+  debug_settings_error_patch_1 = &kernel_ptr[K##x##_DEBUG_SETTINGS_ERROR_PATCH_1];               \
+  debug_settings_error_patch_2 = &kernel_ptr[K##x##_DEBUG_SETTINGS_ERROR_PATCH_2];               \
+  /* mount_patch = &kernel_ptr[K##x##_MOUNT_PATCH]; */                                           \
   depth_limit_patch = &kernel_ptr[K##x##_DEPTH_LIMIT_PATCH];
 
 #define install_macro(x)                                                    \
@@ -35,8 +37,6 @@
   kernel_ptr = (uint8_t *)kernel_base;                                      \
   kernel_pmap_store = &kernel_ptr[K##x##_PMAP_STORE];                       \
   pmap_protect_p_patch = &kernel_ptr[K##x##_PMAP_PROTECT_P];                \
-  prison0_addr = (void **)&kernel_ptr[K##x##_PRISON_0];                     \
-  rootvnode_addr = (void **)&kernel_ptr[K##x##_ROOTVNODE];                  \
   pmap_protect = (void *)(kernel_base + K##x##_PMAP_PROTECT);
 
 struct kpayload_payload_header {
@@ -68,6 +68,10 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   uint8_t *kmem;
 
   // Pointers to be assigned in build_kpayload macro
+  uint8_t *uart_patch;
+  // uint8_t *is_diag_process_patch;
+  // uint8_t *allow_system_level_logging_patch;
+  // uint8_t *allow_coredump_patch;
   uint8_t *copyin_patch_1;
   uint8_t *copyin_patch_2;
   uint8_t *copyout_patch_1;
@@ -76,21 +80,12 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   uint8_t *copyinstr_patch_2;
   uint8_t *copyinstr_patch_3;
   uint8_t *setlogin_patch;
-  //uint8_t *panic_patch;
-  uint8_t *Patch_setuid;
-  uint8_t *dispsw_patch;  
-  uint8_t *debug_settings_error_patch_1;
-  uint8_t *debug_settings_error_patch_2;
   uint8_t *pfs_signature_check_patch;
   uint8_t *debug_rif_patch_1;
   uint8_t *debug_rif_patch_2;
-  //uint8_t *enable_ptrace_patch1;
-  //uint8_t *sys_dynlib_dlsym_patch1;
-  //uint8_t *dynlib_patch_1;
-  //uint8_t *dynlib_patch_2;
-  //uint8_t *enable_ptrace_patch2; 
-  //uint8_t *enable_debug_log_patch;  
-  uint8_t *uart_patch;  
+  uint8_t *debug_settings_error_patch_1;
+  uint8_t *debug_settings_error_patch_2;
+  // uint8_t *mount_patch;
   uint8_t *depth_limit_patch;
 
   uint16_t fw_version = args->kpayload_firmware_info->fw_version;
@@ -101,6 +96,37 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   // Disable write protection
   uint64_t cr0 = readCr0();
   writeCr0(cr0 & ~X86_CR0_WP);
+
+  // Enable UART
+  kmem = (uint8_t *)uart_patch;
+  kmem[0] = 0x00;
+
+  // sceSblACMgrIsDiagProcess
+  // kmem = (uint8_t *)is_diag_process_patch;
+  // kmem[0] = 0xB8;
+  // kmem[1] = 0x01;
+  // kmem[2] = 0x00;
+  // kmem[3] = 0x00;
+  // kmem[4] = 0x00;
+  // kmem[5] = 0xC3;
+
+  // sceSblACMgrIsAllowedSystemLevelDebugging
+  // kmem = (uint8_t *)allow_system_level_logging_patch;
+  // kmem[0] = 0xB8;
+  // kmem[1] = 0x01;
+  // kmem[2] = 0x00;
+  // kmem[3] = 0x00;
+  // kmem[4] = 0x00;
+  // kmem[5] = 0xC3;
+
+  // sceSblACMgrIsAllowedCoredump
+  // kmem = (uint8_t *)allow_coredump_patch;
+  // kmem[0] = 0xB8;
+  // kmem[1] = 0x01;
+  // kmem[2] = 0x00;
+  // kmem[3] = 0x00;
+  // kmem[4] = 0x00;
+  // kmem[5] = 0xC3;
 
   // Patch copyin/copyout/copyinstr to allow userland + kernel addresses in both params
   // copyin
@@ -147,42 +173,6 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   kmem[3] = 0xEB;
   kmem[4] = 0x00;
 
-  //panic
- 	/*kmem = (uint8_t *)panic_patch;
-	kmem[0] = 0x90;
-	kmem[1] = 0x90;
-	kmem[2] = 0x90;
-	kmem[3] = 0x90;
-	kmem[4] = 0x90;*/
-  
-  // Patch setuid: Don't run kernel exploit more than once/privilege escalation
-	kmem = (uint8_t *)Patch_setuid;
-	kmem[0] = 0xB8;
-	kmem[1] = 0x00;
-	kmem[2] = 0x00;
-	kmem[3] = 0x00;
-	kmem[4] = 0x00;
-	//kmem = (uint8_t *)target_id;
-	//kmem[0] = 0x82;  
-	kmem = (uint8_t *)dispsw_patch;
-	kmem[0x36] |= 0x14;
-	kmem[0x59] |= 0x02;
-	kmem[0x5A] |= 0x00;
-	kmem[0x78] |= 0x00;
-
-  // Patch debug setting errors
-  kmem = (uint8_t *)debug_settings_error_patch_1;
-  kmem[0] = 0x00;
-  kmem[1] = 0x00;
-  kmem[2] = 0x00;
-  kmem[3] = 0x00;
-
-  kmem = (uint8_t *)debug_settings_error_patch_2;
-  kmem[0] = 0x00;
-  kmem[1] = 0x00;
-  kmem[2] = 0x00;
-  kmem[3] = 0x00;
-
   // Disable PFS signature check
   kmem = (uint8_t *)pfs_signature_check_patch;
   kmem[0] = 0x31;
@@ -200,51 +190,23 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   kmem[1] = 0x01;
   kmem[2] = 0xC3;
 
-  // ptrace patches	
-	/*kmem = (uint8_t*)enable_ptrace_patch1;
-	kmem[0] = 0x90;
-	kmem[1] = 0x90;
-	kmem[2] = 0x90;
-	kmem[3] = 0x90;
-	kmem[4] = 0x90;
-	kmem[5] = 0x90;
+  // Patch debug setting errors
+  kmem = (uint8_t *)debug_settings_error_patch_1;
+  kmem[0] = 0x00;
+  kmem[1] = 0x00;
+  kmem[2] = 0x00;
+  kmem[3] = 0x00;
 
-	// flatz Patch sys_dynlib_dlsym: Allow from anywhere
-	kmem = (uint8_t *)sys_dynlib_dlsym_patch1;
-	kmem[0] = 0xEB;
-	kmem[1] = 0x4C;
+  kmem = (uint8_t *)debug_settings_error_patch_2;
+  kmem[0] = 0x00;
+  kmem[1] = 0x00;
+  kmem[2] = 0x00;
+  kmem[3] = 0x00;
 
-  kmem = (uint8_t *)dynlib_patch_1;
-  kmem[0] = 0xE9;
-  kmem[1] = 0x90;
- 
-  kmem = (uint8_t *)dynlib_patch_2;
-  kmem[0] = 0x48;
-  kmem[1] = 0x31;
-  kmem[2] = 0xC0;
-  kmem[3] = 0xC3;
-
-	// second ptrace patch
-	// via DeathRGH
-	kmem = (uint8_t *)enable_ptrace_patch2;
-	kmem[0] = 0xE9;
-	kmem[1] = 0x7C;
-	kmem[2] = 0x02;
-	kmem[3] = 0x00;
-	kmem[4] = 0x00;
-
-	// Enable *all* debugging logs (in vprintf)
-	// Patch by: SiSTRo
-	kmem = (uint8_t *)enable_debug_log_patch;
-	kmem[0] = 0xEB;
-	kmem[1] = 0x3B;*/
-
-  // Enable UART
-  kmem = (uint8_t *)uart_patch;
-	kmem[0] = 0x00;
-	kmem[1] = 0x00;
-	kmem[2] = 0x00;
-	kmem[3] = 0x00;
+  // Enable mount for unprivileged user
+  // kmem = (uint8_t *)mount_patch;
+  // kmem[0] = 0xEB;
+  // kmem[1] = 0x04;
 
   // Change directory depth limit from 9 to 64
   kmem = (uint8_t *)depth_limit_patch;
@@ -326,19 +288,11 @@ static int kpayload_install_payload(struct thread *td, struct kpayload_install_p
   // Use "kmem" for all patches
   uint8_t *kmem;
 
-	struct ucred *cred;
-	struct filedesc *fd;
-
-	fd = td->td_proc->p_fd;
-	cred = td->td_proc->p_ucred;
-
   // Pointers to be assigned in build_kpayload macro
   void *kernel_pmap_store;
   uint8_t *pmap_protect_p_patch;
   uint8_t *payload_buffer;
-  void **prison0_addr;
-  void **rootvnode_addr;
-  
+
   void (*pmap_protect)(void *pmap, uint64_t sva, uint64_t eva, uint8_t pr);
 
   uint16_t fw_version = args->kpayload_payload_info->fw_version;
@@ -373,169 +327,6 @@ static int kpayload_install_payload(struct thread *td, struct kpayload_install_p
   if (!payload_data || payload_size < sizeof(payload_header) || payload_header->signature != 0x5041594C4F414458ull) { // `payloadx`
     return -1;
   }
-
-	cred->cr_uid = 0;
-	cred->cr_ruid = 0;
-	cred->cr_rgid = 0;
-	cred->cr_groups[0] = 0;
-
-	cred->cr_prison = *prison0_addr;
-	fd->fd_rdir = fd->fd_jdir = *rootvnode_addr;
-
-	// escalate ucred privs, needed for access to the filesystem ie* mounting & decrypting files
-	void *td_ucred = *(void **)(((char *)td) + 304); // p_ucred == td_ucred
-
-	// sceSblACMgrIsSystemUcred
-	uint64_t *sonyCred = (uint64_t *)(((char *)td_ucred) + 96);
-	*sonyCred = 0xffffffffffffffff;
-
-	// sceSblACMgrGetDeviceAccessType
-	uint64_t *sceProcType = (uint64_t *)(((char *)td_ucred) + 88);
-	*sceProcType = 0x3801000000000013; // Max access
-
-	// sceSblACMgrGetDeviceAccessType
-	uint64_t *sceRemotePlay = (uint64_t *)(((char *)td_ucred) + 88);
-	*sceRemotePlay = 0x3800000000000019; // SceRemotePlay
-	
-	// sceSblACMgrGetDeviceAccessType
-	uint64_t *sceOSUPDATE = (uint64_t *)(((char *)td_ucred) + 88);
-	*sceOSUPDATE = 0x3801000000000024; // sceOSUPDATE
-	
-	// sceSblACMgrGetDeviceAccessType
-	uint64_t *scevtr = (uint64_t *)(((char *)td_ucred) + 88);
-	*scevtr = 0x3800800000000002; // scevtr
-
-	// sceSblACMgrGetDeviceAccessType
-	uint64_t *NPXS20103 = (uint64_t *)(((char *)td_ucred) + 88);
-	*NPXS20103 = 0x3800000000000011; // NPXS20103
-	
-	// sceSblACMgrIsAllowedToUseUNK_PFS
-	uint64_t *UNK_PFS = (uint64_t *)(((char *)td_ucred) + 88);
-	*UNK_PFS = 0x380100000000000A; // UNK_PFS
-
-	// sceSblACMgrIsAllowedToUseUNK_ICC
-	uint64_t *UNK_ICC = (uint64_t *)(((char *)td_ucred) + 88);
-	*UNK_ICC = 0x3800800000000024; // UNK_ICC
-	
-	// sceSblACMgrIsAllowedToUsePupUpdate0
-	uint64_t *PupUpdate0 = (uint64_t *)(((char *)td_ucred) + 88);
-	*PupUpdate0 = 0x3800100000000001; // PupUpdate0
-	
-	// sceSblACMgrIsAllowedToUseSecureWebProcess
-	uint64_t *SecureWebProcess = (uint64_t *)(((char *)td_ucred) + 88);
-	*SecureWebProcess = 0x3800000010000003; // SecureWebProcess
-	
-	// sceSblACMgrIsAllowedToUseSceNKWebProcess
-	uint64_t *SceNKWebProcess = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceNKWebProcess = 0x3800000000010003; // SceNKWebProcess
-
-	// sceSblACMgrIsAllowedToUseSecureUIProcess
-	uint64_t *SecureUIProcess = (uint64_t *)(((char *)td_ucred) + 88);
-	*SecureUIProcess = 0x3800000000000033; // SecureUIProcess
-	
-	// sceSblACMgrIsAllowedToUseSceNKUIProcess
-	uint64_t *SceNKUIProcess = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceNKUIProcess = 0x380000000000003c; // SceNKUIProcess
-	
-	// sceSblACMgrIsAllowedToUseSceSysAvControl
-	uint64_t *SceSysAvControl = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceSysAvControl = 0x380000000000001; // SceSysAvControl
-
-	// sceSblACMgrIsAllowedToUseSceShellUI
-	uint64_t *SceShellUI = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceShellUI = 0x380000000000000f; // SceShellUI
-
-	// sceSblACMgrIsAllowedToUseSceShellCore
-	uint64_t *SceShellCore = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceShellCore = 0x3800000000000010; // SceShellCore
-
-	// sceSblACMgrIsAllowedToUseDecid
-	uint64_t *Decid = (uint64_t *)(((char *)td_ucred) + 88);
-	*Decid = 0x3800000000010003; // Decid
-
-	// sceSblACMgrGetDeviceSceVdecProxy
-	uint64_t *SceVdecProxy = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceVdecProxy = 0x3800000000000003; // SceVdecProxy
-
-	// sceSblACMgrGetDeviceSceVencProxy
-	uint64_t *SceVencProxy = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceVencProxy = 0x3800000000000004; // SceVencProxy
-	
-	// sceSblACMgrGetDeviceOrbisaudiod
-	uint64_t *Orbisaudiod = (uint64_t *)(((char *)td_ucred) + 88);
-	*Orbisaudiod = 0x3800000000000005; // Orbisaudiod
-	
-	// sceSblACMgrGetDeviceCoredump
-	uint64_t *Coredump = (uint64_t *)(((char *)td_ucred) + 88);
-	*Coredump = 0x3800000000000006; // Coredump
-
-	// sceSblACMgrGetDeviceOrbissetip
-	uint64_t *Orbissetip = (uint64_t *)(((char *)td_ucred) + 88);
-	*Orbissetip = 0x3800000000000008; // Orbissetip
-
-	// sceSblACMgrIsAllowedToUseGnmCompositor
-	uint64_t *GnmCompositor = (uint64_t *)(((char *)td_ucred) + 88);
-	*GnmCompositor = 0x3800000000000009; // GnmCompositor
-
-	// sceSblACMgrIsAllowedToUseSceGameLiveStreaming
-	uint64_t *SceGameLiveStreaming = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceGameLiveStreaming = 0x3800000000000012; // SceGameLiveStreaming
-	
-	// sceSblACMgrIsAllowedToUseSCE_SYS_SERVICES
-	uint64_t *SCE_SYS_SERVICES = (uint64_t *)(((char *)td_ucred) + 88);
-	*SCE_SYS_SERVICES = 0x3800000000010003; // SCE_SYS_SERVICES
-	
-	// sceSblACMgrIsAllowedToUseScePartyDaemon
-	uint64_t *ScePartyDaemon = (uint64_t *)(((char *)td_ucred) + 88);
-	*ScePartyDaemon = 0x3800000000000014; // ScePartyDaemon
-
-	// sceSblACMgrIsAllowedToUseSceAvCapture
-	uint64_t *SceAvCapture = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceAvCapture = 0x3800000000000015; // SceAvCapture
-	
-	// sceSblACMgrIsAllowedToUseSceVideoCoreServer
-	uint64_t *SceVideoCoreServer = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceVideoCoreServer = 0x3800000000000016; // SceVideoCoreServer	
-
-	// sceSblACMgrIsAllowedToUsemini_syscore
-	uint64_t *mini_syscore = (uint64_t *)(((char *)td_ucred) + 88);
-	*mini_syscore = 0x3800000000000022; // mini_syscore
-
-	// sceSblACMgrIsAllowedToUseSceCloudClientDaemon
-	uint64_t *SceCloudClientDaemon = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceCloudClientDaemon = 0x3800000000000028; // SceCloudClientDaemon
-	
-	// sceSblACMgrIsAllowedToUsefs_cleaner
-	uint64_t *fs_cleaner = (uint64_t *)(((char *)td_ucred) + 88);
-	*fs_cleaner = 0x380000000000001d; // fs_cleaner	
-
-	// sceSblACMgrIsAllowedToUseSceSocialScreenMgr
-	uint64_t *SceSocialScreenMgr = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceSocialScreenMgr = 0x3800000000000037; // SceSocialScreenMgr
-
-	// sceSblACMgrIsAllowedToUseSceSpZeroConf
-	uint64_t *SceSpZeroConf = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceSpZeroConf = 0x380000001000000E; // SceSpZeroConf
-
-	// sceSblACMgrIsAllowedToUseSceMusicCoreServer
-	uint64_t *SceMusicCoreServer = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceMusicCoreServer = 0x380000000000001a; // SceMusicCoreServer
-
-	// sceSblACMgrIsAllowedToUsesceSblACMgrHasUseHp3dPipeCapability
-	uint64_t *sceSblACMgrHasUseHp3dPipeCapability = (uint64_t *)(((char *)td_ucred) + 88);
-	*sceSblACMgrHasUseHp3dPipeCapability = 0x3800000010000009; // sceSblACMgrHasUseHp3dPipeCapability
-
-	// sceSblACMgrIsAllowedToUsesceSblACMgrHasUseHp3dPipeCapability2
-	uint64_t *sceSblACMgrHasUseHp3dPipeCapability2 = (uint64_t *)(((char *)td_ucred) + 88);
-	*sceSblACMgrHasUseHp3dPipeCapability2 = 0x380100000000002C; // sceSblACMgrHasUseHp3dPipeCapability2
-	
-	// sceSblACMgrIsAllowedToUseSceSysCore
-	uint64_t *SceSysCore = (uint64_t *)(((char *)td_ucred) + 88);
-	*SceSysCore = 0x3800000000000007; // SceSysCore	
-				
-	// sceSblACMgrHasSceProcessCapability
-	uint64_t *sceProcCap = (uint64_t *)(((char *)td_ucred) + 104);
-	*sceProcCap = 0xffffffffffffffff; // Sce Process
 
   // Disable write protection
   uint64_t cr0 = readCr0();

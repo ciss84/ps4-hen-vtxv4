@@ -182,7 +182,7 @@ int _main(struct thread *td) {
   }
 
   //printf_notification("Welcome to HEN %s", VERSION);
-  printf_notification3("/user/data/icon0.png", "HEN-Vtx-" VERSION);
+  printf_notification3("/user/data/icon0.png", "Vtx-Hen-" VERSION);
   
   const bool kill_ui = true;
   const int sleep_sec = kill_ui ? 5 : 1;
