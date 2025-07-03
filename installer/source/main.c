@@ -122,7 +122,7 @@ int _main(struct thread *td) {
   }
 
   // Jailbreak the process
-  //jailbreak();
+  jailbreak();
 
   // Apply all HEN kernel patches
   install_patches();
@@ -183,9 +183,6 @@ int _main(struct thread *td) {
 
   //printf_notification("Welcome to HEN %s", VERSION);
   printf_notification3("/user/data/icon0.png", "HEN-Vtx-" VERSION);
-
-	//Restore the original jail for the current Process.
-	//RestoreJail(td->td_proc, bkJail);
   
   const bool kill_ui = true;
   const int sleep_sec = kill_ui ? 5 : 1;

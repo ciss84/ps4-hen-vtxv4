@@ -6,7 +6,6 @@
 void write_blob(const char *path, const void *blob, const size_t blobsz);
 void kill_proc(const char *proc);
 void block_updates(void);
-//void RestoreJail(proc* proc, Backup_Jail jail);
 
 #define printf_notification3(icon_uri, ...)    {                                                       \
   SceNotificationRequest noti_buffer;                                                                  \

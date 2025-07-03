@@ -18,23 +18,24 @@ mkdir -p tmp
 cd tmp
 
 # known bundled plugins
-PRX_FILES="plugin_bootloader.prx plugin_loader.prx plugin_server.prx plugin_mono.prx"
+PRX_FILES="plugin_bootloader.prx plugin_loader.prx plugin_server.prx"
 
 SKIP_DOWNLOAD=false
 if [ -f plugins.zip ]; then
   SKIP_DOWNLOAD=true
-fi
+else
   for prx in "${PRX_FILES[@]}"; do
     if [ -f "$prx" ]; then
       SKIP_DOWNLOAD=true
       break
     fi
   done
+fi
 
 if [ "$SKIP_DOWNLOAD" = false ]; then
   f="plugins.zip"
   rm -f $f
-  curl -fLJO https://github.com/ciss84/ps4-hen-plugins/releases/download/b131/plugins.zip
+  curl -fLJO https://github.com/ciss84/ps4-hen-plugins/releases/download/b133/plugins.zip
   unzip $f
 fi
 
