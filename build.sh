@@ -18,19 +18,18 @@ mkdir -p tmp
 cd tmp
 
 # known bundled plugins
-PRX_FILES="plugin_bootloader.prx plugin_loader.prx plugin_server.prx"
+PRX_FILES="plugin_bootloader.prx plugin_loader.prx plugin_server.prx plugin_mono.prx"
 
 SKIP_DOWNLOAD=false
 if [ -f plugins.zip ]; then
   SKIP_DOWNLOAD=true
-else
+fi
   for prx in "${PRX_FILES[@]}"; do
     if [ -f "$prx" ]; then
       SKIP_DOWNLOAD=true
       break
     fi
   done
-fi
 
 if [ "$SKIP_DOWNLOAD" = false ]; then
   f="plugins.zip"
