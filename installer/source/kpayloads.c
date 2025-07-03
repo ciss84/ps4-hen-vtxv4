@@ -38,7 +38,7 @@
   kernel_pmap_store = &kernel_ptr[K##x##_PMAP_STORE];                       \
   pmap_protect_p_patch = &kernel_ptr[K##x##_PMAP_PROTECT_P];                \
   prison0_addr = (void **)&kernel_ptr[K##x##_PRISON_0];                     \
-  rootvnode_addr = (void **)&kernel_ptr[K##x##_ROOTVNODE];                  \  
+  rootvnode_addr = (void **)&kernel_ptr[K##x##_ROOTVNODE];                  \
   pmap_protect = (void *)(kernel_base + K##x##_PMAP_PROTECT);
 
 struct kpayload_payload_header {
@@ -99,37 +99,6 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   uint64_t cr0 = readCr0();
   writeCr0(cr0 & ~X86_CR0_WP);
 
-  // Enable UART
-  kmem = (uint8_t *)uart_patch;
-  kmem[0] = 0x00;
-
-  // sceSblACMgrIsDiagProcess
-  // kmem = (uint8_t *)is_diag_process_patch;
-  // kmem[0] = 0xB8;
-  // kmem[1] = 0x01;
-  // kmem[2] = 0x00;
-  // kmem[3] = 0x00;
-  // kmem[4] = 0x00;
-  // kmem[5] = 0xC3;
-
-  // sceSblACMgrIsAllowedSystemLevelDebugging
-  // kmem = (uint8_t *)allow_system_level_logging_patch;
-  // kmem[0] = 0xB8;
-  // kmem[1] = 0x01;
-  // kmem[2] = 0x00;
-  // kmem[3] = 0x00;
-  // kmem[4] = 0x00;
-  // kmem[5] = 0xC3;
-
-  // sceSblACMgrIsAllowedCoredump
-  // kmem = (uint8_t *)allow_coredump_patch;
-  // kmem[0] = 0xB8;
-  // kmem[1] = 0x01;
-  // kmem[2] = 0x00;
-  // kmem[3] = 0x00;
-  // kmem[4] = 0x00;
-  // kmem[5] = 0xC3;
-
   // Patch copyin/copyout/copyinstr to allow userland + kernel addresses in both params
   // copyin
   kmem = (uint8_t *)copyin_patch_1;
@@ -175,6 +144,42 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   kmem[3] = 0xEB;
   kmem[4] = 0x00;
 
+  //panic
+ 	/*kmem = (uint8_t *)panic_patch;
+	kmem[0] = 0x90;
+	kmem[1] = 0x90;
+	kmem[2] = 0x90;
+	kmem[3] = 0x90;
+	kmem[4] = 0x90;
+  
+  // Patch setuid: Don't run kernel exploit more than once/privilege escalation
+	kmem = (uint8_t *)Patch_setuid;
+	kmem[0] = 0xB8;
+	kmem[1] = 0x00;
+	kmem[2] = 0x00;
+	kmem[3] = 0x00;
+	kmem[4] = 0x00;*/
+	//kmem = (uint8_t *)target_id;
+	//kmem[0] = 0x82;  
+	kmem = (uint8_t *)dispsw_patch;
+	kmem[0x36] |= 0x14;
+	kmem[0x59] |= 0x02;
+	kmem[0x5A] |= 0x00;
+	kmem[0x78] |= 0x00;
+
+  // Patch debug setting errors
+  kmem = (uint8_t *)debug_settings_error_patch_1;
+  kmem[0] = 0x00;
+  kmem[1] = 0x00;
+  kmem[2] = 0x00;
+  kmem[3] = 0x00;
+
+  kmem = (uint8_t *)debug_settings_error_patch_2;
+  kmem[0] = 0x00;
+  kmem[1] = 0x00;
+  kmem[2] = 0x00;
+  kmem[3] = 0x00;
+
   // Disable PFS signature check
   kmem = (uint8_t *)pfs_signature_check_patch;
   kmem[0] = 0x31;
@@ -192,23 +197,51 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   kmem[1] = 0x01;
   kmem[2] = 0xC3;
 
-  // Patch debug setting errors
-  kmem = (uint8_t *)debug_settings_error_patch_1;
-  kmem[0] = 0x00;
-  kmem[1] = 0x00;
-  kmem[2] = 0x00;
-  kmem[3] = 0x00;
+  // ptrace patches	
+	/*kmem = (uint8_t*)enable_ptrace_patch1;
+	kmem[0] = 0x90;
+	kmem[1] = 0x90;
+	kmem[2] = 0x90;
+	kmem[3] = 0x90;
+	kmem[4] = 0x90;
+	kmem[5] = 0x90;
 
-  kmem = (uint8_t *)debug_settings_error_patch_2;
-  kmem[0] = 0x00;
-  kmem[1] = 0x00;
-  kmem[2] = 0x00;
-  kmem[3] = 0x00;
+	// flatz Patch sys_dynlib_dlsym: Allow from anywhere
+	kmem = (uint8_t *)sys_dynlib_dlsym_patch1;
+	kmem[0] = 0xEB;
+	kmem[1] = 0x4C;
 
-  // Enable mount for unprivileged user
-  // kmem = (uint8_t *)mount_patch;
-  // kmem[0] = 0xEB;
-  // kmem[1] = 0x04;
+  kmem = (uint8_t *)dynlib_patch_1;
+  kmem[0] = 0xE9;
+  kmem[1] = 0x90;
+ 
+  kmem = (uint8_t *)dynlib_patch_2;
+  kmem[0] = 0x48;
+  kmem[1] = 0x31;
+  kmem[2] = 0xC0;
+  kmem[3] = 0xC3;
+
+	// second ptrace patch
+	// via DeathRGH
+	kmem = (uint8_t *)enable_ptrace_patch2;
+	kmem[0] = 0xE9;
+	kmem[1] = 0x7C;
+	kmem[2] = 0x02;
+	kmem[3] = 0x00;
+	kmem[4] = 0x00;
+
+	// Enable *all* debugging logs (in vprintf)
+	// Patch by: SiSTRo
+	kmem = (uint8_t *)enable_debug_log_patch;
+	kmem[0] = 0xEB;
+	kmem[1] = 0x3B;*/
+
+  // Enable UART
+  kmem = (uint8_t *)uart_patch;
+	kmem[0] = 0x00;
+	kmem[1] = 0x00;
+	kmem[2] = 0x00;
+	kmem[3] = 0x00;
 
   // Change directory depth limit from 9 to 64
   kmem = (uint8_t *)depth_limit_patch;
