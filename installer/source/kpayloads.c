@@ -35,9 +35,13 @@
   kernel_ptr = (uint8_t *)kernel_base;                                      \
   kernel_pmap_store = &kernel_ptr[K##x##_PMAP_STORE];                       \
   pmap_protect_p_patch = &kernel_ptr[K##x##_PMAP_PROTECT_P];                \
-  prison0_addr = (void **)&kernel_ptr[K##x##_PRISON_0];                     \
-  rootvnode_addr = (void **)&kernel_ptr[K##x##_ROOTVNODE];                  \
   pmap_protect = (void *)(kernel_base + K##x##_PMAP_PROTECT);
+
+#define jailbreakbis_macro(x)                                               \
+  kernel_base = &((uint8_t *)__readmsr(0xC0000082))[-K##x##_XFAST_SYSCALL]; \
+  kernel_ptr = (uint8_t *)kernel_base;                                      \
+  prison0 = (void **)&kernel_ptr[K##x##_PRISON_0];                          \
+  rootvnode = (void **)&kernel_ptr[K##x##_ROOTVNODE];
 
 struct kpayload_payload_header {
   uint64_t signature;
@@ -326,17 +330,10 @@ static int kpayload_install_payload(struct thread *td, struct kpayload_install_p
   // Use "kmem" for all patches
   uint8_t *kmem;
 
-  struct filedesc *fd;
-  struct ucred *cred;
-  fd = td->td_proc->p_fd;
-  cred = td->td_proc->p_ucred;
-
   // Pointers to be assigned in build_kpayload macro
   void *kernel_pmap_store;
   uint8_t *pmap_protect_p_patch;
   uint8_t *payload_buffer;
-  void **prison0_addr;
-  void **rootvnode_addr;
 
   void (*pmap_protect)(void *pmap, uint64_t sva, uint64_t eva, uint8_t pr);
 
@@ -373,13 +370,138 @@ static int kpayload_install_payload(struct thread *td, struct kpayload_install_p
     return -1;
   }
 
+  // Disable write protection
+  uint64_t cr0 = readCr0();
+  writeCr0(cr0 & ~X86_CR0_WP);
+
+  memset(payload_buffer, '\0', PAGE_SIZE);
+  memcpy(payload_buffer, payload_data, payload_size);
+
+  uint64_t sss = ((uint64_t)payload_buffer) & ~(uint64_t)(PAGE_SIZE - 1);
+  uint64_t eee = ((uint64_t)payload_buffer + payload_size + PAGE_SIZE - 1) & ~(uint64_t)(PAGE_SIZE - 1);
+
+  kmem = (uint8_t *)pmap_protect_p_patch;
+  kmem[0] = 0xEB;
+  pmap_protect(kernel_pmap_store, sss, eee, 7);
+  kmem = (uint8_t *)pmap_protect_p_patch;  
+  kmem[0] = 0x75;
+
+  // Restore write protection
+  writeCr0(cr0);
+
+  int (*payload_entrypoint)(uint16_t, struct configuration);
+  *((void **)&payload_entrypoint) = (void *)(&payload_buffer[payload_header->entrypoint_offset]);
+
+  return payload_entrypoint(fw_version, config);
+}
+
+// HACK: Fix missing/bad/conflicting exploit patches for supported FWs //////////////////////////////////////////////////////
+// Lua+Lapse and PSFree+Lapse have the correct patch from 7.00-12.02, every FW *should* match these
+// Try to get these patches fixed/added upstream if possible
+// It's hard to tell with ps4jb2 because so many people forked/tweaked it
+//     Try to get it fixed in the "official" release and assume hosts will update
+// Check these:
+// 5.00, 5.01, 5.03, 5.05, 5.07                                          // PS4-5.05-Kernel-Exploit, ps4-ipv6-uaf
+// 6.00, 6.02, 6.20, 6.50, 6.51,                                         // ps4-ipv6-uaf
+// 6.70, 6.71, 6.72                                                      // ps4-ipv6-uaf, ps4jb2
+// 7.00, 7.01, 7.02, 7.50, 7.51, 7.55                                    // ps4-ipv6-uaf, ps4jb2, pppwn
+// 8.00, 8.01, 8.03, 8.50, 8.52                                          // pppwn
+// 9.00                                                                  // pOOBs4, pppwn
+// 9.03, 9.04, 9.50, 9.51, 9.60                                          // pppwn
+// 10.00, 10.01, 10.50, 10.70, 10.71                                     // pppwn
+// 11.00                                                                 // pppwn
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static int kpayload_exploit_fixes(struct thread *td, struct kpayload_firmware_args *args) {
+  UNUSED(td);
+  void *kernel_base;
+  uint8_t *kernel_ptr;
+
+  // Use "kmem" for all patches
+  uint8_t *kmem;
+
+  uint16_t fw_version = args->kpayload_firmware_info->fw_version;
+
+  // NOTE: This is a C preprocessor macro
+  build_kpayload(fw_version, kernel_ptr_macro);
+
+  // Disable write protection
+  uint64_t cr0 = readCr0();
+  writeCr0(cr0 & ~X86_CR0_WP);
+
+  // patch sys_dynlib_dlsym() to allow dynamic symbol resolution everywhere
+  if (fw_version >= 505 && fw_version <= 507) {
+    // Cryptogenic/PS4-5.05-Kernel-Exploit: ????
+    // ChendoChap/ps4-ipv6-uaf:             ????
+    kmem = (uint8_t *)&kernel_ptr[0x00237F3A];
+    kmem[0] = 0x90;
+    kmem[1] = 0xE9;
+    kmem[2] = 0xC0;
+    kmem[3] = 0x01;
+    kmem[4] = 0x00;
+    kmem[5] = 0x00;
+  } else if (fw_version == 672) {
+    // ChendoChap/ps4-ipv6-uaf: Good
+    // sleirsgoevy/ps4jb2:      Bad/Missing?
+    kmem = (uint8_t *)&kernel_ptr[0x001D895A];
+    kmem[0] = 0x90;
+    kmem[1] = 0xE9;
+    kmem[2] = 0xC6;
+    kmem[3] = 0x01;
+    kmem[4] = 0x00;
+    kmem[5] = 0x00;
+  } else if (fw_version >= 700 && fw_version <= 702) {
+    // ChendoChap/ps4-ipv6-uaf: Good
+    // sleirsgoevy/ps4jb2:      Bad/Missing?
+    // TheOfficialFloW/PPPwn:   Missing
+    kmem = (uint8_t *)&kernel_ptr[0x0009547B];
+    kmem[0] = 0x90;
+    kmem[1] = 0xE9;
+    kmem[2] = 0xBC;
+    kmem[3] = 0x01;
+    kmem[4] = 0x00;
+    kmem[5] = 0x00;
+  } else if (fw_version >= 750 && fw_version <= 7.55) {
+    // ChendoChap/ps4-ipv6-uaf: Good
+    // sleirsgoevy/ps4jb2:      Bad/Missing?
+    // TheOfficialFloW/PPPwn:   Missing
+    kmem = (uint8_t *)&kernel_ptr[0x004523C4];
+    kmem[0] = 0x90;
+    kmem[1] = 0xE9;
+    kmem[2] = 0xC7;
+    kmem[3] = 0x01;
+    kmem[4] = 0x00;
+    kmem[5] = 0x00;
+  }
+
+  // Restore write protection
+  writeCr0(cr0);
+
+  return 0;
+}
+
+int kpayload_jailbreakbis(struct thread *td, struct kpayload_firmware_args *args) {
+  struct filedesc *fd;
+  struct ucred *cred;
+  fd = td->td_proc->p_fd;
+  cred = td->td_proc->p_ucred;
+
+  void *kernel_base;
+  uint8_t *kernel_ptr;
+  void **prison0;
+  void **rootvnode;
+
+  uint16_t fw_version = args->kpayload_firmware_info->fw_version;
+
+  // NOTE: This is a C preprocessor macro
+  build_kpayload(fw_version, jailbreakbis_macro);
+
   cred->cr_uid = 0;
   cred->cr_ruid = 0;
   cred->cr_rgid = 0;
   cred->cr_groups[0] = 0;
 
-	cred->cr_prison = *prison0_addr;
-	fd->fd_rdir = fd->fd_jdir = *rootvnode_addr;
+  cred->cr_prison = *prison0;
+  fd->fd_rdir = fd->fd_jdir = *rootvnode;
 
 	// escalate ucred privs, needed for access to the filesystem ie* mounting & decrypting files
 	void *td_ucred = *(void **)(((char *)td) + 304); // p_ucred == td_ucred
@@ -536,112 +658,16 @@ static int kpayload_install_payload(struct thread *td, struct kpayload_install_p
 	uint64_t *sceProcCap = (uint64_t *)(((char *)td_ucred) + 104);
 	*sceProcCap = 0xffffffffffffffff; // Sce Process
 
-  // Disable write protection
-  uint64_t cr0 = readCr0();
-  writeCr0(cr0 & ~X86_CR0_WP);
-
-  memset(payload_buffer, '\0', PAGE_SIZE);
-  memcpy(payload_buffer, payload_data, payload_size);
-
-  uint64_t sss = ((uint64_t)payload_buffer) & ~(uint64_t)(PAGE_SIZE - 1);
-  uint64_t eee = ((uint64_t)payload_buffer + payload_size + PAGE_SIZE - 1) & ~(uint64_t)(PAGE_SIZE - 1);
-
-  kmem = (uint8_t *)pmap_protect_p_patch;
-  kmem[0] = 0xEB;
-  pmap_protect(kernel_pmap_store, sss, eee, 7);
-  kmem[0] = 0x75;
-
-  // Restore write protection
-  writeCr0(cr0);
-
-  int (*payload_entrypoint)(uint16_t, struct configuration);
-  *((void **)&payload_entrypoint) = (void *)(&payload_buffer[payload_header->entrypoint_offset]);
-
-  return payload_entrypoint(fw_version, config);
+  return 0;
 }
 
-// HACK: Fix missing/bad/conflicting exploit patches for supported FWs //////////////////////////////////////////////////////
-// Lua+Lapse and PSFree+Lapse have the correct patch from 7.00-12.02, every FW *should* match these
-// Try to get these patches fixed/added upstream if possible
-// It's hard to tell with ps4jb2 because so many people forked/tweaked it
-//     Try to get it fixed in the "official" release and assume hosts will update
-// Check these:
-// 5.00, 5.01, 5.03, 5.05, 5.07                                          // PS4-5.05-Kernel-Exploit, ps4-ipv6-uaf
-// 6.00, 6.02, 6.20, 6.50, 6.51,                                         // ps4-ipv6-uaf
-// 6.70, 6.71, 6.72                                                      // ps4-ipv6-uaf, ps4jb2
-// 7.00, 7.01, 7.02, 7.50, 7.51, 7.55                                    // ps4-ipv6-uaf, ps4jb2, pppwn
-// 8.00, 8.01, 8.03, 8.50, 8.52                                          // pppwn
-// 9.00                                                                  // pOOBs4, pppwn
-// 9.03, 9.04, 9.50, 9.51, 9.60                                          // pppwn
-// 10.00, 10.01, 10.50, 10.70, 10.71                                     // pppwn
-// 11.00                                                                 // pppwn
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static int kpayload_exploit_fixes(struct thread *td, struct kpayload_firmware_args *args) {
-  UNUSED(td);
-  void *kernel_base;
-  uint8_t *kernel_ptr;
-
-  // Use "kmem" for all patches
-  uint8_t *kmem;
-
-  uint16_t fw_version = args->kpayload_firmware_info->fw_version;
-
-  // NOTE: This is a C preprocessor macro
-  build_kpayload(fw_version, kernel_ptr_macro);
-
-  // Disable write protection
-  uint64_t cr0 = readCr0();
-  writeCr0(cr0 & ~X86_CR0_WP);
-
-  // patch sys_dynlib_dlsym() to allow dynamic symbol resolution everywhere
-  if (fw_version >= 505 && fw_version <= 507) {
-    // Cryptogenic/PS4-5.05-Kernel-Exploit: ????
-    // ChendoChap/ps4-ipv6-uaf:             ????
-    kmem = (uint8_t *)&kernel_ptr[0x00237F3A];
-    kmem[0] = 0x90;
-    kmem[1] = 0xE9;
-    kmem[2] = 0xC0;
-    kmem[3] = 0x01;
-    kmem[4] = 0x00;
-    kmem[5] = 0x00;
-  } else if (fw_version == 672) {
-    // ChendoChap/ps4-ipv6-uaf: Good
-    // sleirsgoevy/ps4jb2:      Bad/Missing?
-    kmem = (uint8_t *)&kernel_ptr[0x001D895A];
-    kmem[0] = 0x90;
-    kmem[1] = 0xE9;
-    kmem[2] = 0xC6;
-    kmem[3] = 0x01;
-    kmem[4] = 0x00;
-    kmem[5] = 0x00;
-  } else if (fw_version >= 700 && fw_version <= 702) {
-    // ChendoChap/ps4-ipv6-uaf: Good
-    // sleirsgoevy/ps4jb2:      Bad/Missing?
-    // TheOfficialFloW/PPPwn:   Missing
-    kmem = (uint8_t *)&kernel_ptr[0x0009547B];
-    kmem[0] = 0x90;
-    kmem[1] = 0xE9;
-    kmem[2] = 0xBC;
-    kmem[3] = 0x01;
-    kmem[4] = 0x00;
-    kmem[5] = 0x00;
-  } else if (fw_version >= 750 && fw_version <= 7.55) {
-    // ChendoChap/ps4-ipv6-uaf: Good
-    // sleirsgoevy/ps4jb2:      Bad/Missing?
-    // TheOfficialFloW/PPPwn:   Missing
-    kmem = (uint8_t *)&kernel_ptr[0x004523C4];
-    kmem[0] = 0x90;
-    kmem[1] = 0xE9;
-    kmem[2] = 0xC7;
-    kmem[3] = 0x01;
-    kmem[4] = 0x00;
-    kmem[5] = 0x00;
+int jailbreakbis() {
+  if (is_jailbroken()) {
+    return 0;
   }
-
-  // Restore write protection
-  writeCr0(cr0);
-
-  return 0;
+  struct kpayload_firmware_info kpayload_firmware_info;
+  kpayload_firmware_info.fw_version = get_firmware();
+  return kexec(&kpayload_jailbreakbis, &kpayload_firmware_info);
 }
 
 // Passes on the result of kpayload_patches

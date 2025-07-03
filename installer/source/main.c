@@ -122,7 +122,7 @@ int _main(struct thread *td) {
   }
 
   // Jailbreak the process
-  //jailbreak();
+  jailbreakbis();
 
   // Apply all HEN kernel patches
   install_patches();
