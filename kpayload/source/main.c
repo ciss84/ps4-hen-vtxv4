@@ -360,16 +360,16 @@ PAYLOAD_CODE int my_entrypoint(uint16_t fw_version_arg, struct configuration con
   if (!config.skip_patches) {
     install_patches();
   }
+  if (config.enable_ftp) {
+    resolve_patterns();
+    resolve_syscall();
+    install_syscall_hooks2();
+  }  
   if (config.enable_plugins) {
     resolve_patterns();
     resolve_syscall();
     install_syscall_hooks();
   }
-  /*if (config.enable_ftp) {
-    resolve_patterns();
-    resolve_syscall();
-    install_syscall_hooks2();
-  }*/
   
   return 0;
 }

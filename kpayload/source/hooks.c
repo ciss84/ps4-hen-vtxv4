@@ -315,7 +315,7 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
   return r;
 }
 
-/*PAYLOAD_CODE int sys_dynlib_load_prx_hook2(struct thread *td, struct dynlib_load_prx_args *args) {
+PAYLOAD_CODE int sys_dynlib_load_prx_hook2(struct thread *td, struct dynlib_load_prx_args *args) {
   const int r = sys_dynlib_load_prx(td, args);
   const bool isPartyDaemon = strstr(td->td_name, "ScePartyDaemonMain") != NULL;
   const char *titleid = td->td_proc->titleid;
@@ -343,7 +343,7 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
     printf("%s init env 0x%lx plugin load 0x%lx\n", titleid, init_env_ptr, plugin_load_ptr);
   }
   return r;
-}*/
+}
 
 PAYLOAD_CODE void install_syscall_hooks(void) {
   uint64_t flags, cr0;
@@ -364,7 +364,7 @@ PAYLOAD_CODE void install_syscall_hooks(void) {
   writeCr0(cr0);
 }
 
-/*PAYLOAD_CODE void install_syscall_hooks2(void) {
+PAYLOAD_CODE void install_syscall_hooks2(void) {
   uint64_t flags, cr0;
 
   cr0 = readCr0();
@@ -381,4 +381,4 @@ PAYLOAD_CODE void install_syscall_hooks(void) {
 
   intr_restore(flags);
   writeCr0(cr0);
-}*/
+}
