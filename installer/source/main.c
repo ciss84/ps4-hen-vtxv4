@@ -238,7 +238,7 @@ int _main(struct thread *td) {
      uint32_t ret = sceKernelGetCpuTemperature(&CPU_Temp);
      sceKernelSleep(100);
      printf_debug("returned %d\n%i", ret);
-     printf_notification("Temperature\n*Cpu: %d*C\n*Soc: %i*C", CPU_Temp);
+     printf_notification("Temperature\n*Cpu: %d*C", CPU_Temp);
      }    
   }
 
