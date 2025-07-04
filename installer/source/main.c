@@ -126,9 +126,6 @@ int _main(struct thread *td) {
     return -1;
   }
 
-	errno = 0;
-	result = !result ? 0 : errno;
-
   // Jailbreak the process
   jailbreakbis();
 
