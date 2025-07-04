@@ -17,7 +17,7 @@
 #include "hooks.h"
 
 #include "../../installer/include/path.h"
-#include "../../installer/include/config.h"
+#include "../../installer/include/config_struct.h"
 
 extern char *(*strstr)(const char *haystack, const char *needle)PAYLOAD_BSS;
 extern void *(*memcpy)(void *dst, const void *src, size_t len)PAYLOAD_BSS;
@@ -302,7 +302,6 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
     if (isPartyDaemon)
     {
      struct configuration config;
-     init_config(&config);
      if (config.enable_ftp) {
       my_args.prx_path = PRX_SERVER_PATH;
      }
