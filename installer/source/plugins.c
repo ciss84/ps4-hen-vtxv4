@@ -1,7 +1,6 @@
 #include "common.h"
 #include "path.h"
 
-#include "version.h"
 #include "plugins.h"
 
 // will force rebuild because its translation unit to be built first
@@ -12,8 +11,6 @@
 #include "plugin_mono.prx.inc.c"
 
 void upload_prx_to_disk(void) {
-  write_blob(BASE_PATH "/" VERSION_TXT, VERSION, sizeof(VERSION) - 1);
-  write_blob(HDD_INI_PATH, hen_ini, hen_ini_len);
   write_blob(PRX_BOOTLOADER_PATH, plugin_bootloader_prx, plugin_bootloader_prx_len);
   write_blob(PRX_LOADER_PATH, plugin_loader_prx, plugin_loader_prx_len);
   write_blob(PRX_SERVER_PATH, plugin_server_prx, plugin_server_prx_len);

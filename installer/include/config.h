@@ -4,5 +4,7 @@
 #include "config_struct.h"
 
 int init_config(struct configuration *config);
+void upload_ver(void);
+
 
 #endif
