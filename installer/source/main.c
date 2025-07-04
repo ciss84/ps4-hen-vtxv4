@@ -186,17 +186,6 @@ int _main(struct thread *td) {
   printf_notification3("/user/data/icon0.png", "Fan Threshold Set to %i°C/%i°F!", THRESHOLDTEMP, (int)fahrenheit);
   }
   
-  if (config.temp) {
-  temps = 1;
-  while (temps)
-  {
-    uint32_t CPU_Temp;
-    sceKernelGetCpuTemperature(&CPU_Temp);
-    printf_notification3("/user/data/icon0.png", "*Cpu: %d*C\n*Soc: %i*C", CPU_Temp);
-    sceKernelSleep(100);
-    }
-  }
-  
   if (config.nobd_patches) {
     printf_debug("Installing NoBD patches...\n");
     no_bd_patch();
@@ -238,6 +227,17 @@ int _main(struct thread *td) {
   // or manually killed in this case
   kill_proc("ScePartyDaemon");
   kill_proc(proc);
+
+  if (config.temp) {
+  temps = 1;
+  while (temps)
+  {
+    uint32_t CPU_Temp;
+    sceKernelGetCpuTemperature(&CPU_Temp);
+    printf_notification3("/user/data/icon0.png", "*Cpu: %d*C\n", CPU_Temp);
+    sceKernelSleep(100);
+    }
+  }
 
   return 0;
 }
