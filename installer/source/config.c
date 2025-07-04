@@ -13,6 +13,7 @@
 #define DEFAULT_ENABLE_BROWSER 1
 #define DEFAULT_KERNEL_CLOCK 1
 #define DEFAULT_FAN 0
+#define DEFAULT_TEMPS 1
 #define DEFAULT_NOBD_PATCHES 0
 #define DEFAULT_SKIP_PATCHES 0
 #define DEFAULT_UPLOAD_PRX 1
@@ -36,7 +37,8 @@ static void set_config_defaults(struct configuration *config) {
   config->disable_aslr = DEFAULT_DISABLE_ASLR;
   config->enable_browser = DEFAULT_ENABLE_BROWSER;  
   config->kernel_clock = DEFAULT_KERNEL_CLOCK; 
-  config->fan = DEFAULT_FAN; 
+  config->fan = DEFAULT_FAN;
+  config->temps = DEFAULT_TEMPS;  
   config->nobd_patches = DEFAULT_NOBD_PATCHES;
   config->upload_prx = DEFAULT_UPLOAD_PRX;
   config->enable_plugins = DEFAULT_ENABLE_PLUGINS;
@@ -77,6 +79,8 @@ static int config_handler(void *config, const char *name, const char *value) {
     return set_bool_config("kernel_clock", value, &config_p->kernel_clock, DEFAULT_KERNEL_CLOCK); 
   } else if (MATCH("fan")) {
     return set_bool_config("fan", value, &config_p->fan, DEFAULT_FAN); 
+  } else if (MATCH("temps")) {
+    return set_bool_config("temps", value, &config_p->temps, DEFAULT_TEMPS); 
   } else if (MATCH("nobd_patches")) {
     return set_bool_config("nobd_patches", value, &config_p->nobd_patches, DEFAULT_NOBD_PATCHES);
   } else if (MATCH("skip_patches")) {

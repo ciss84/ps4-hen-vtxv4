@@ -10,7 +10,8 @@ struct configuration {
   int disable_aslr;
   int enable_browser;
   int kernel_clock;
-  int fan;    
+  int fan;
+  int temp;  
   int nobd_patches;
   int skip_patches;
   int upload_prx;

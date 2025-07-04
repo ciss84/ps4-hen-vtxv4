@@ -105,7 +105,7 @@ static void set_target_id(char *tid) {
 }
 
 uint8_t THRESHOLDTEMP = 60;
-
+int temps;
 int _main(struct thread *td) {
   UNUSED(td);
 
@@ -184,6 +184,17 @@ int _main(struct thread *td) {
 
   float fahrenheit = ((THRESHOLDTEMP * 9) / 5) + 32;
   printf_notification3("/user/data/icon0.png", "Fan Threshold Set to %i°C/%i°F!", THRESHOLDTEMP, (int)fahrenheit);
+  }
+  
+  if (config.temp) {
+  temps = 1;
+  while (temps)
+  {
+    uint32_t CPU_Temp;
+    sceKernelGetCpuTemperature(&CPU_Temp);
+    printf_notification3("/user/data/icon0.png", "*Cpu: %d*C\n*Soc: %i*C", CPU_Temp);
+    sceKernelSleep(100);
+    }
   }
   
   if (config.nobd_patches) {
