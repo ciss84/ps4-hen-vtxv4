@@ -112,6 +112,8 @@ int _main(struct thread *td) {
   initKernel();
   initLibc();
 
+  int result;
+
 #ifdef DEBUG_SOCKET
   initNetwork();
   DEBUG_SOCK = SckConnect(DEBUG_IP, DEBUG_PORT);
@@ -239,5 +241,5 @@ int _main(struct thread *td) {
     }
   }
 
-  return 0;
+  return result;
 }
