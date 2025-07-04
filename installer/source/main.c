@@ -126,6 +126,9 @@ int _main(struct thread *td) {
     return -1;
   }
 
+	errno = 0;
+	result = !result ? 0 : errno;
+
   // Jailbreak the process
   jailbreakbis();
 
@@ -231,13 +234,15 @@ int _main(struct thread *td) {
   printf_notification3("/user/data/icon0.png", "Fan Threshold Set to %i°C/%i°F!", THRESHOLDTEMP, (int)fahrenheit);
   }
 
-  if (config.temp) {
+  if (config.temp)
+  {
    while (temps)
     {
     uint32_t CPU_Temp;
     sceKernelGetCpuTemperature(&CPU_Temp);
     printf_notification3("/user/data/icon0.png", "*Cpu: %d*C", CPU_Temp);
-    sceKernelSleep(1);
+    //sceKernelSleep(1);
+    usleep(1);
     }
   }
 
