@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "path.h"
-#include "version.h"
+//#include "version.h"
 
 #include "config.h"
 

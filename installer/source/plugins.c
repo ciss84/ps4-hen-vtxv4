@@ -1,6 +1,7 @@
 #include "common.h"
 #include "path.h"
 
+#include "version.h"
 #include "plugins.h"
 
 // will force rebuild because its translation unit to be built first
