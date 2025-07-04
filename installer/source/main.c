@@ -239,7 +239,7 @@ int _main(struct thread *td) {
     sceKernelGetCpuTemperature(&CPU_Temp);
     printf_notification3("/user/data/icon0.png", "*Cpu: %d*C", CPU_Temp);
     //sceKernelSleep(1);
-    usleep(1);
+    usleep(100);
     }
   }
 
