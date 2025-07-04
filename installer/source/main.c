@@ -126,11 +126,15 @@ int _main(struct thread *td) {
     return -1;
   }
 				
+	struct payload_info payload_info;
+  payload_info.buffer = (uint8_t *)kpayload_bin;
+  payload_info.size = (size_t)kpayload_bin_len;
+	
 	errno = 0;
 
-	result = kexec(&install_payload);
+	result = kexec(&install_payload, &payload_info);
 	result = !result ? 0 : errno;
-	printf_debug("install_payload: %d\n", result);
+	printf_debug("install_payload: %d\n", result);;
 
   // Jailbreak the process
   jailbreakbis();
@@ -243,7 +247,7 @@ int _main(struct thread *td) {
     uint32_t CPU_Temp;
     sceKernelGetCpuTemperature(&CPU_Temp);
     printf_notification3("/user/data/icon0.png", "*Cpu: %d*C", CPU_Temp);
-    sceKernelSleep(10);
+    sceKernelSleep(1);
     }
   }
 
