@@ -290,19 +290,13 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
       proc_rw_mem(td->td_proc, (void *)(init_env_ptr + sizeof(jmp)), sizeof(plugin_load_ptr), &plugin_load_ptr, 0, 1);
     }
   }
-  const bool isPartyDaemon = strstr(td->td_name, "ScePartyDaemonMain") != NULL;
   const bool isShellUI = strstr(td->td_name, "SceShellUIMain") != NULL;
-  //printf("%d %d\n", isPartyDaemon, isShellUI);
-  if (strstr(p, "/common/lib/libSceSysmodule.sprx") && (isPartyDaemon || isShellUI))
+  if (strstr(p, "/common/lib/libSceSysmodule.sprx") && (isShellUI))
   {
     // dummy process to load server prx into
     struct dynlib_load_prx_args my_args = {};
     int handle = 0;
-    if (isPartyDaemon)
-    {
-      //my_args.prx_path = PRX_SERVER_PATH;
-    }
-    else if (isShellUI)
+    if (isShellUI)
     {
       my_args.prx_path = PRX_MONO_PATH;
     }
@@ -323,7 +317,9 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
 
 PAYLOAD_CODE int sys_dynlib_load_prx_hook2(struct thread *td, struct dynlib_load_prx_args *args) {
   const bool isPartyDaemon = strstr(td->td_name, "ScePartyDaemonMain") != NULL;
-  //printf("%d %d\n", isPartyDaemon, isShellUI);
+  const char *titleid = td->td_proc->titleid;
+  const char *p = args->prx_path ? args->prx_path : "";
+  const uint8_t jmp[] = {0xff, 0x25, 0x00, 0x00, 0x00, 0x00};
   if (strstr(p, "/common/lib/libSceSysmodule.sprx") && (isPartyDaemon))
   {
     // dummy process to load server prx into
