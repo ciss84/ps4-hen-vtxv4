@@ -25,7 +25,7 @@
 
 static void upload_ver(void) {
   write_blob(BASE_PATH "/" VERSION_TXT, VERSION, sizeof(VERSION) - 1);
-  //write_blob(HDD_INI_PATH, hen_ini, hen_ini_len);
+  write_blob(HDD_INI_PATH, hen_ini, hen_ini_len);
 }
 
 // Helper function to set all configuration values to their defaults
@@ -143,7 +143,7 @@ int init_config(struct configuration *config) {
     if (cfg_parse(HDD_INI_PATH, config_handler, config) < 0) {
       printf_notification("ERROR: Unable to load `" HDD_INI_PATH "`");
       // Restore defaults in case parsing partially succeeded before failing
-      set_config_defaults(config);
+      //set_config_defaults(config);
     } else {
       ret = 0;
     }
