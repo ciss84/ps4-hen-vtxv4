@@ -123,7 +123,7 @@ int init_config(struct configuration *config) {
     mkdir(BASE_PATH, 777);
   }
 
-  upload_ver();
+  //upload_ver();
 
   int ret = -1;
   set_config_defaults(config);

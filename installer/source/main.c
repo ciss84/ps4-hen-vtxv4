@@ -189,11 +189,11 @@ int _main(struct thread *td) {
   }
 
   if (config.upload_prx) {
-    printf_debug("Writing plugin PRXs to disk...\n");
+    printf_debug("Writing plugin PRXs and ini to disk...\n");
     upload_prx_to_disk();
+    upload_ver();
   }
 
-  //printf_notification("Welcome to HEN %s", VERSION);
   printf_notification3("/user/data/icon0.png", "HEN-Vtx-" VERSION);
   
   const bool kill_ui = true;
