@@ -27,6 +27,10 @@
   pfs_signature_check_patch = &kernel_ptr[K##x##_PFS_SIGNATURE_CHECK_PATCH];                     \
   debug_rif_patch_1 = &kernel_ptr[K##x##_DEBUG_RIF_PATCH_1];                                     \
   debug_rif_patch_2 = &kernel_ptr[K##x##_DEBUG_RIF_PATCH_2];                                     \
+  enable_ptrace_patch1 = &kernel_ptr[K##x##_PTRACE_1];                                           \
+  enable_ptrace_patch2 = &kernel_ptr[K##x##_PTRACE_2];                                           \
+  sys_dynlib_dlsym_patch1 = &kernel_ptr[K##x##_DYNLIB_DLSYM];                                    \
+  enable_debug_log_patch = &kernel_ptr[K##x##_DEBUG_LOG];                                        \
   uart_patch = &kernel_ptr[K##x##_UART_PATCH];                                                   \
   depth_limit_patch = &kernel_ptr[K##x##_DEPTH_LIMIT_PATCH];
 
@@ -88,12 +92,12 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   uint8_t *pfs_signature_check_patch;
   uint8_t *debug_rif_patch_1;
   uint8_t *debug_rif_patch_2;
-  //uint8_t *enable_ptrace_patch1;
-  //uint8_t *sys_dynlib_dlsym_patch1;
+  uint8_t *enable_ptrace_patch1;
+  uint8_t *enable_ptrace_patch2;  
+  uint8_t *sys_dynlib_dlsym_patch1;
   //uint8_t *dynlib_patch_1;
   //uint8_t *dynlib_patch_2;
-  //uint8_t *enable_ptrace_patch2; 
-  //uint8_t *enable_debug_log_patch;  
+  uint8_t *enable_debug_log_patch;  
   uint8_t *uart_patch;  
   uint8_t *depth_limit_patch;
 
@@ -204,29 +208,14 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
   kmem[1] = 0x01;
   kmem[2] = 0xC3;
 
-  // ptrace patches	
-	/*kmem = (uint8_t*)enable_ptrace_patch1;
+  // ptrace patches	one
+	kmem = (uint8_t*)enable_ptrace_patch1;
 	kmem[0] = 0x90;
 	kmem[1] = 0x90;
 	kmem[2] = 0x90;
 	kmem[3] = 0x90;
 	kmem[4] = 0x90;
 	kmem[5] = 0x90;
-
-	// flatz Patch sys_dynlib_dlsym: Allow from anywhere
-	kmem = (uint8_t *)sys_dynlib_dlsym_patch1;
-	kmem[0] = 0xEB;
-	kmem[1] = 0x4C;
-
-  kmem = (uint8_t *)dynlib_patch_1;
-  kmem[0] = 0xE9;
-  kmem[1] = 0x90;
- 
-  kmem = (uint8_t *)dynlib_patch_2;
-  kmem[0] = 0x48;
-  kmem[1] = 0x31;
-  kmem[2] = 0xC0;
-  kmem[3] = 0xC3;
 
 	// second ptrace patch
 	// via DeathRGH
@@ -236,12 +225,27 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
 	kmem[2] = 0x02;
 	kmem[3] = 0x00;
 	kmem[4] = 0x00;
+	
+	// flatz Patch sys_dynlib_dlsym: Allow from anywhere
+	kmem = (uint8_t *)sys_dynlib_dlsym_patch1;
+	kmem[0] = 0xEB;
+	kmem[1] = 0x4C;
+
+  /*kmem = (uint8_t *)dynlib_patch_1;
+  kmem[0] = 0xE9;
+  kmem[1] = 0x90;
+ 
+  kmem = (uint8_t *)dynlib_patch_2;
+  kmem[0] = 0x48;
+  kmem[1] = 0x31;
+  kmem[2] = 0xC0;
+  kmem[3] = 0xC3;*/
 
 	// Enable *all* debugging logs (in vprintf)
 	// Patch by: SiSTRo
 	kmem = (uint8_t *)enable_debug_log_patch;
 	kmem[0] = 0xEB;
-	kmem[1] = 0x3B;*/
+	kmem[1] = 0x3B;
 
   // Enable UART
   kmem = (uint8_t *)uart_patch;
