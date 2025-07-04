@@ -15,6 +15,7 @@ struct configuration {
   int nobd_patches;
   int skip_patches;
   int upload_prx;
+  int enable_ftp;  
   int enable_plugins;
   char target_id[TARGET_ID_SIZE + 1]; // Add null term
 };

@@ -366,6 +366,8 @@ PAYLOAD_CODE int my_entrypoint(uint16_t fw_version_arg, struct configuration con
     install_syscall_hooks();
   }
   if (config.enable_ftp) {
+    resolve_patterns();
+    resolve_syscall();
     install_syscall_hooks2();
   }
   

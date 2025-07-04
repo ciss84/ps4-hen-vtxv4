@@ -17,8 +17,8 @@
 #define DEFAULT_NOBD_PATCHES 0
 #define DEFAULT_SKIP_PATCHES 0
 #define DEFAULT_UPLOAD_PRX 1
-#define DEFAULT_ENABLE_PLUGINS 1
 #define DEFAULT_ENABLE_FTP 0
+#define DEFAULT_ENABLE_PLUGINS 1
 
 #include "hen.ini.inc.c"
 
