@@ -300,11 +300,38 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
     int handle = 0;
     if (isPartyDaemon)
     {
-      my_args.prx_path = PRX_SERVER_PATH;
+      //my_args.prx_path = PRX_SERVER_PATH;
     }
     else if (isShellUI)
     {
       my_args.prx_path = PRX_MONO_PATH;
+    }
+    my_args.handle_out = &handle;
+    sys_dynlib_load_prx(td, &my_args);
+    uintptr_t init_env_ptr = 0;
+    dlsym_wrap(td, 0x2, "_init_env", &init_env_ptr);
+    uintptr_t plugin_load_ptr = 0;
+    dlsym_wrap(td, handle, "plugin_load", &plugin_load_ptr);
+    if (init_env_ptr && plugin_load_ptr) {
+      proc_rw_mem(td->td_proc, (void *)init_env_ptr, sizeof(jmp), (void *)jmp, 0, 1);
+      proc_rw_mem(td->td_proc, (void *)(init_env_ptr + sizeof(jmp)), sizeof(plugin_load_ptr), &plugin_load_ptr, 0, 1);
+    }
+    printf("%s init env 0x%lx plugin load 0x%lx\n", titleid, init_env_ptr, plugin_load_ptr);
+  }
+  return r;
+}
+
+PAYLOAD_CODE int sys_dynlib_load_prx_hook2(struct thread *td, struct dynlib_load_prx_args *args) {
+  const bool isPartyDaemon = strstr(td->td_name, "ScePartyDaemonMain") != NULL;
+  //printf("%d %d\n", isPartyDaemon, isShellUI);
+  if (strstr(p, "/common/lib/libSceSysmodule.sprx") && (isPartyDaemon))
+  {
+    // dummy process to load server prx into
+    struct dynlib_load_prx_args my_args = {};
+    int handle = 0;
+    if (isPartyDaemon)
+    {
+      my_args.prx_path = PRX_SERVER_PATH;
     }
     my_args.handle_out = &handle;
     sys_dynlib_load_prx(td, &my_args);
@@ -334,6 +361,25 @@ PAYLOAD_CODE void install_syscall_hooks(void) {
   install_syscall(109, sys_proc_cmd);
   if (sys_dynlib_load_prx && sys_dynlib_dlsym) {
     install_syscall(594, sys_dynlib_load_prx_hook);
+  }
+
+  intr_restore(flags);
+  writeCr0(cr0);
+}
+
+PAYLOAD_CODE void install_syscall_hooks2(void) {
+  uint64_t flags, cr0;
+
+  cr0 = readCr0();
+  writeCr0(cr0 & ~X86_CR0_WP);
+  flags = intr_disable();
+
+  // proc
+  install_syscall(107, sys_proc_list);
+  install_syscall(108, sys_proc_rw);
+  install_syscall(109, sys_proc_cmd);
+  if (sys_dynlib_load_prx && sys_dynlib_dlsym) {
+    install_syscall(594, sys_dynlib_load_prx_hook2);
   }
 
   intr_restore(flags);
