@@ -316,6 +316,7 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
 }
 
 PAYLOAD_CODE int sys_dynlib_load_prx_hook2(struct thread *td, struct dynlib_load_prx_args *args) {
+  const int r = sys_dynlib_load_prx(td, args);
   const bool isPartyDaemon = strstr(td->td_name, "ScePartyDaemonMain") != NULL;
   const char *titleid = td->td_proc->titleid;
   const char *p = args->prx_path ? args->prx_path : "";
