@@ -125,6 +125,13 @@ int _main(struct thread *td) {
     printf_notification("Unsupported Firmware");
     return -1;
   }
+
+  struct kpayload_payload_info {
+    uint16_t fw_version;
+    struct configuration config;
+    uint8_t *buffer;
+    size_t size;
+  };
 				
 	errno = 0;
 
