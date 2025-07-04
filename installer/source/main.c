@@ -125,17 +125,10 @@ int _main(struct thread *td) {
     printf_notification("Unsupported Firmware");
     return -1;
   }
-
-  struct kpayload_payload_info {
-    uint16_t fw_version;
-    struct configuration config;
-    uint8_t *buffer;
-    size_t size;
-  };
 				
 	errno = 0;
 
-	result = kexec(&install_payload, &kpayload_payload_info);
+	result = kexec(&install_payload);
 	result = !result ? 0 : errno;
 	printf_debug("install_payload: %d\n", result);
 
