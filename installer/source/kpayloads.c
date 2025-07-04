@@ -469,35 +469,35 @@ static int kpayload_exploit_fixes(struct thread *td, struct kpayload_firmware_ar
     kmem[4] = 0x00;
     kmem[5] = 0x00;
   } else if (fw_version >= 800 && fw_version <= 803) {
-	  kmem = (uint8_t *)&kernel_ptr[0x0031953F]
+	  kmem = (uint8_t *)&kernel_ptr[0x0031953F];
 	  kmem[0] = 0xEB;
 	  kmem[1] = 0x4C;    
   } else if (fw_version >= 850 && fw_version <= 852) {
-	  kmem = (uint8_t *)&kernel_ptr[0x00017C2F]
+	  kmem = (uint8_t *)&kernel_ptr[0x00017C2F];
 	  kmem[0] = 0xEB;
 	  kmem[1] = 0x4C; 
   } else if (fw_version >= 900 && fw_version <= 904) {
-	  kmem = (uint8_t *)&kernel_ptr[0x0023B34F]
+	  kmem = (uint8_t *)&kernel_ptr[0x0023B34F];
 	  kmem[0] = 0xEB;
 	  kmem[1] = 0x4C;
   } else if (fw_version >= 950 && fw_version <= 960) {
-	  kmem = (uint8_t *)&kernel_ptr[0x0019FEDF]
+	  kmem = (uint8_t *)&kernel_ptr[0x0019FEDF];
 	  kmem[0] = 0xEB;
 	  kmem[1] = 0x4C;
   } else if (fw_version >= 1000 && fw_version <= 1001) {
-	  kmem = (uint8_t *)&kernel_ptr[0x0019025F]
+	  kmem = (uint8_t *)&kernel_ptr[0x0019025F];
 	  kmem[0] = 0xEB;
 	  kmem[1] = 0x4C;
   } else if (fw_version >= 1050 && fw_version <= 1071) {
-	  kmem = (uint8_t *)&kernel_ptr[0x00213088]
+	  kmem = (uint8_t *)&kernel_ptr[0x00213088];
 	  kmem[0] = 0xEB;
 	  kmem[1] = 0x4C;
   } else if (fw_version >= 1100 && fw_version <= 1102) {
-	  kmem = (uint8_t *)&kernel_ptr[0x001E4CC8]
+	  kmem = (uint8_t *)&kernel_ptr[0x001E4CC8];
 	  kmem[0] = 0xEB;
 	  kmem[1] = 0x4C;
   } else if (fw_version >= 1150 && fw_version <= 1250) {
-	  kmem = (uint8_t *)&kernel_ptr[0x001B7718]
+	  kmem = (uint8_t *)&kernel_ptr[0x001B7718];
 	  kmem[0] = 0xEB;
 	  kmem[1] = 0x4C;	    	  
   }
