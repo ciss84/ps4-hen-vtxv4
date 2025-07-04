@@ -233,13 +233,13 @@ int _main(struct thread *td) {
 
   if (config.temp)
   {
+  }
    while (temps) {
      uint32_t CPU_Temp;
      uint32_t ret = sceKernelGetCpuTemperature(&CPU_Temp);
      printf_debug("returned %d\n%i", ret);
      printf_notification("Temperature\n*Cpu: %d*C", CPU_Temp);
      sceKernelSleep(100);
-     }    
   }
 
   return 0;
