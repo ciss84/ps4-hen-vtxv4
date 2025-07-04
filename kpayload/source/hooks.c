@@ -18,6 +18,7 @@
 
 #include "../../installer/include/path.h"
 #include "../../installer/include/config_struct.h"
+#include "../../installer/include/config.h"
 
 extern char *(*strstr)(const char *haystack, const char *needle)PAYLOAD_BSS;
 extern void *(*memcpy)(void *dst, const void *src, size_t len)PAYLOAD_BSS;
@@ -299,7 +300,6 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
     // dummy process to load server prx into
     struct dynlib_load_prx_args my_args = {};
     int handle = 0;
-    memcpy(&config, &config_arg, sizeof(struct configuration));
     if (isPartyDaemon)
     {
      if (config.enable_ftp) {
