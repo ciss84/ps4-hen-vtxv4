@@ -227,9 +227,9 @@ static int kpayload_patches(struct thread *td, struct kpayload_firmware_args *ar
 	kmem[4] = 0x00;
 	
 	// flatz Patch sys_dynlib_dlsym: Allow from anywhere
-	kmem = (uint8_t *)sys_dynlib_dlsym_patch1;
+	/*kmem = (uint8_t *)sys_dynlib_dlsym_patch1;
 	kmem[0] = 0xEB;
-	kmem[1] = 0x4C;
+	kmem[1] = 0x4C;*/
 
   /*kmem = (uint8_t *)dynlib_patch_1;
   kmem[0] = 0xE9;
@@ -475,8 +475,15 @@ static int kpayload_exploit_fixes(struct thread *td, struct kpayload_firmware_ar
     kmem[3] = 0x01;
     kmem[4] = 0x00;
     kmem[5] = 0x00;
-  }
-
+  } else if (fw_version >= 900 && fw_version <= 904) {
+	  kmem = (uint8_t *)&kernel_ptr[0x0023B34F]
+	  kmem[0] = 0xEB;
+	  kmem[1] = 0x4C;
+  } else if (fw_version >= 950 && fw_version <= 960) {
+	  kmem = (uint8_t *)&kernel_ptr[0x0019FEDF]
+	  kmem[0] = 0xEB;
+	  kmem[1] = 0x4C;
+  }  	  
   // Restore write protection
   writeCr0(cr0);
 
