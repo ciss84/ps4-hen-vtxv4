@@ -126,6 +126,16 @@ int _main(struct thread *td) {
     return -1;
   }
 
+	struct payload_info payload_info;
+	payload_info.buffer = (uint8_t *)kpayload;
+	payload_info.size = (size_t)kpayload_size;
+				
+	errno = 0;
+
+	result = kexec(&install_payload, &payload_info);
+	result = !result ? 0 : errno;
+	printf_debug("install_payload: %d\n", result);
+
   // Jailbreak the process
   jailbreakbis();
 
