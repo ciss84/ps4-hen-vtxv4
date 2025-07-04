@@ -113,7 +113,6 @@ int _main(struct thread *td) {
   initKernel();
   initLibc();
   temps = 1;
-  int result;
 
 #ifdef DEBUG_SOCKET
   initNetwork();
@@ -243,5 +242,5 @@ int _main(struct thread *td) {
      }    
   }
 
-  return result;
+  return 0;
 }
