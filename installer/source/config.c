@@ -25,7 +25,7 @@
 
 static void upload_ver(void) {
   write_blob(BASE_PATH "/" VERSION_TXT, VERSION, sizeof(VERSION) - 1);
-  write_blob(HDD_INI_PATH/*, hen_ini, hen_ini_len*/);
+  write_blob(HDD_INI_PATH, hen_ini, hen_ini_len);
 }
 
 // Helper function to set all configuration values to their defaults
