@@ -17,7 +17,7 @@
 #include "hooks.h"
 
 #include "../../installer/include/path.h"
-#include "../../installer/include/config_struct.h"
+#include "../../installer/include/config.h"
 
 extern char *(*strstr)(const char *haystack, const char *needle)PAYLOAD_BSS;
 extern void *(*memcpy)(void *dst, const void *src, size_t len)PAYLOAD_BSS;
