@@ -13,6 +13,9 @@
 #include "plugins.h"
 #include "version.h"
 
+int temps;
+uint8_t THRESHOLDTEMP = 60;
+
 void writeCacheImg()
 {
 size_t len = 0;
@@ -104,14 +107,12 @@ static void set_target_id(char *tid) {
 
 }
 
-uint8_t THRESHOLDTEMP = 60;
-int temps;
 int _main(struct thread *td) {
   UNUSED(td);
 
   initKernel();
   initLibc();
-
+  temps = 1;
   int result;
 
 #ifdef DEBUG_SOCKET
@@ -231,13 +232,12 @@ int _main(struct thread *td) {
   }
 
   if (config.temp) {
-  temps = 1;
-  while (temps)
-  {
+   while (temps)
+    {
     uint32_t CPU_Temp;
     sceKernelGetCpuTemperature(&CPU_Temp);
     printf_notification3("/user/data/icon0.png", "*Cpu: %d*C", CPU_Temp);
-    sceKernelSleep(100);
+    sceKernelSleep(10);
     }
   }
 
