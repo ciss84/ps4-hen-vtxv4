@@ -6,6 +6,7 @@
 void write_blob(const char *path, const void *blob, const size_t blobsz);
 void kill_proc(const char *proc);
 void block_updates(void);
+extern unsigned int (*sceKernelSleep)(unsigned int seconds);
 
 #define printf_notification3(icon_uri, ...)    {                                                       \
   SceNotificationRequest noti_buffer;                                                                  \

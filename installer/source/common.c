@@ -5,6 +5,8 @@
 #define PS4UPDATE_FILE "/update/PS4UPDATE.PUP"
 #define PS4UPDATE_TEMP_FILE "/update/PS4UPDATE.PUP.net.temp"
 
+unsigned int (*sceKernelSleep)(unsigned int seconds);
+
 void write_blob(const char *path, const void *blob, const size_t blobsz) {
   if (!path || !blob || blobsz == 0) {
     printf_notification("Invalid parameters for write_blob");
