@@ -107,10 +107,6 @@ static void set_target_id(char *tid) {
 
 }
 
-int sceSleep() {
-    sceKernelSleep(350);
-}
-
 int _main(struct thread *td) {
   UNUSED(td);
 
@@ -237,12 +233,13 @@ int _main(struct thread *td) {
 
   if (config.temp)
   {
-   while (temps)
-    {
-    uint32_t CPU_Temp;
-    sceKernelGetCpuTemperature(&CPU_Temp);
-    printf_notification3("/user/data/icon0.png", "*Cpu: %d*C", CPU_Temp);
-    }
+   while (temps) {
+     uint32_t CPU_Temp;
+     uint32_t ret = sceKernelGetCpuTemperature(&CPU_Temp);
+     sceKernelSleep(100);
+     printf_debug("returned %d\n%i", ret);
+     printf_notification("Temperature\n*Cpu: %d*C\n*Soc: %i*C", CPU_Temp);
+     }    
   }
 
   return result;
