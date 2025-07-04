@@ -138,6 +138,7 @@ int _main(struct thread *td) {
 
   // Apply all HEN kernel patches
   install_patches();
+  initSysUtil();
   writeCacheImg();
   
   // Initialize config
@@ -238,7 +239,7 @@ int _main(struct thread *td) {
      uint32_t ret = sceKernelGetCpuTemperature(&CPU_Temp);
      printf_debug("returned %d\n%i", ret);
      printf_notification("Temperature\n*Cpu: %d*C", CPU_Temp);
-     Sleep(100);
+     sceKernelSleep(100);
      }    
   }
 

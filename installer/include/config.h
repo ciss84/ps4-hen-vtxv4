@@ -4,6 +4,5 @@
 #include "config_struct.h"
 
 int init_config(struct configuration *config);
-unsigned int Sleep(unsigned int seconds);
 
 #endif
