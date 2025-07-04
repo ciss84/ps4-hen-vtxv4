@@ -477,7 +477,7 @@ static int kpayload_exploit_fixes(struct thread *td, struct kpayload_firmware_ar
 	  kmem[0] = 0xEB;
 	  kmem[1] = 0x4C; 
   } else if (fw_version >= 900 && fw_version <= 904) {
-	  kmem = (uint8_t *)&kernel_ptr[0x0023B34F];
+	  kmem = (uint8_t *)&kernel_ptr[0x0023B67F];
 	  kmem[0] = 0xEB;
 	  kmem[1] = 0x4C;
   } else if (fw_version >= 950 && fw_version <= 960) {
