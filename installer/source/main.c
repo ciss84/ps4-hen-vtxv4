@@ -125,16 +125,6 @@ int _main(struct thread *td) {
     printf_notification("Unsupported Firmware");
     return -1;
   }
-				
-	struct payload_info payload_info;
-  payload_info.buffer = (uint8_t *)kpayload_bin;
-  payload_info.size = (size_t)kpayload_bin_len;
-	
-	errno = 0;
-
-	result = kexec(&install_payload, &payload_info);
-	result = !result ? 0 : errno;
-	printf_debug("install_payload: %d\n", result);;
 
   // Jailbreak the process
   jailbreakbis();
