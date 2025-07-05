@@ -18,6 +18,7 @@
 
 #include "../../installer/include/path.h"
 
+extern struct configuration config PAYLOAD_BSS = {0};
 extern char *(*strstr)(const char *haystack, const char *needle)PAYLOAD_BSS;
 extern void *(*memcpy)(void *dst, const void *src, size_t len)PAYLOAD_BSS;
 extern void *(*memset)(void *s, int c, size_t n)PAYLOAD_BSS;
