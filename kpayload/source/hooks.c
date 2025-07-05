@@ -277,7 +277,7 @@ PAYLOAD_CODE int klogftp(uint16_t fw_version_arg, struct configuration config_ar
   memcpy(&config, &config_arg, sizeof(struct configuration));
   printf("Hello from prx: %i\n", fw_version);
   if (config.enable_ftp) {
-      my_args.prx_path = PRX_SERVER_PATH;
+     PRX_SERVER_PATH;
   }
   return 0;
 }
@@ -315,7 +315,7 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
     int handle = 0;
     if (isPartyDaemon)
     {
-      klogftp();
+      my_args.prx_path = klogftp();
     }
     else if (isShellUI)
     {
