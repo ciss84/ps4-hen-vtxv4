@@ -302,6 +302,7 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
     if (isPartyDaemon)
     {
       struct configuration config_arg;
+      struct configuration config;
       memcpy(&config, &config_arg, sizeof(struct configuration));
       if (config.enable_ftp){my_args.prx_path = PRX_SERVER_PATH;}
     }
