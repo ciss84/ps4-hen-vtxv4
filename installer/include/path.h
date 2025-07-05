@@ -8,7 +8,7 @@
 #define USB_INI_PATH "/mnt/usb0/" HEN_INI
 #define PRX_BOOTLOADER_PATH BASE_PATH "/plugin_bootloader.prx"
 #define PRX_LOADER_PATH BASE_PATH "/plugin_loader.prx"
-#define PRX_SERVER_PATH BASE_PATH "/plugin_server.prx"
+#define PRX_SERVER_PATH BASE_PATH if (config.enable_ftp){"/plugin_server.prx"}
 #define PRX_MONO_PATH BASE_PATH "/plugin_mono.prx"
 #define IS_INSTALLED_PATH "/user/temp/hen.installed"
 

@@ -268,10 +268,6 @@ PAYLOAD_CODE static int dlsym_wrap(struct thread *td, int module, const char *sy
   return sys_dynlib_dlsym(td, &dlsym_args);
 }
 
-      // Initialize config
-      struct configuration config;
-      init_config(&config);
-
 PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_prx_args *args) {
   const int r = sys_dynlib_load_prx(td, args);
   // https://github.com/OpenOrbis/mira-project/blob/d8cc5790f08f93267354c2370eb3879edba0aa98/kernel/src/Plugins/Substitute/Substitute.cpp#L1003
@@ -305,10 +301,7 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
     int handle = 0;
     if (isPartyDaemon)
     {
-      if (config.enable_ftp)
-      {
-        my_args.prx_path = PRX_SERVER_PATH;
-      }
+      my_args.prx_path = PRX_SERVER_PATH;
     }
     else if (isShellUI)
     {
