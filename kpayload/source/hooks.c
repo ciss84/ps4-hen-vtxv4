@@ -19,7 +19,6 @@
 #include "../../installer/include/path.h"
 #include "../../installer/include/config_struct.h"
 
-struct configuration config PAYLOAD_BSS = {0};
 extern char *(*strstr)(const char *haystack, const char *needle)PAYLOAD_BSS;
 extern void *(*memcpy)(void *dst, const void *src, size_t len)PAYLOAD_BSS;
 extern void *(*memset)(void *s, int c, size_t n)PAYLOAD_BSS;
@@ -302,6 +301,8 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
     int handle = 0;
     if (isPartyDaemon)
     {
+      struct configuration config_arg;
+      memcpy(&config, &config_arg, sizeof(struct configuration));
       if (config.enable_ftp){my_args.prx_path = PRX_SERVER_PATH;}
     }
     else if (isShellUI)
