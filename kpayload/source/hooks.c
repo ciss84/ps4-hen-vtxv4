@@ -17,6 +17,7 @@
 #include "hooks.h"
 
 #include "../../installer/include/path.h"
+#include "../../installer/include/config_struct.h"
 
 extern struct configuration config PAYLOAD_BSS = {0};
 extern char *(*strstr)(const char *haystack, const char *needle)PAYLOAD_BSS;
