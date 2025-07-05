@@ -94,6 +94,7 @@ extern void install_fself_hooks(void) PAYLOAD_CODE;
 extern void install_fpkg_hooks(void) PAYLOAD_CODE;
 extern void install_patches(void) PAYLOAD_CODE;
 extern void install_syscall_hooks(void) PAYLOAD_CODE;
+extern void install_syscall_hooksbis(void) PAYLOAD_CODE;
 extern void *get_syscall(uint64_t n) PAYLOAD_CODE;
 
 #define resolve(name) name = (void *)(kernbase + fw_offsets->name##_addr)
@@ -364,7 +365,11 @@ PAYLOAD_CODE int my_entrypoint(uint16_t fw_version_arg, struct configuration con
     resolve_syscall();
     install_syscall_hooks();
   }
-  
+  if (config.enable_ftp){
+    resolve_patterns();
+    resolve_syscall();
+    install_syscall_hooksbis();
+  }  
   return 0;
 }
 
