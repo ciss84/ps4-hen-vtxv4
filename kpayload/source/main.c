@@ -17,7 +17,7 @@
 
 uint16_t fw_version PAYLOAD_BSS = 0;
 const struct kpayload_offsets *fw_offsets PAYLOAD_BSS = NULL;
-//struct configuration config PAYLOAD_BSS = {0};
+struct configuration config PAYLOAD_BSS = {0};
 
 int (*memcmp)(const void *ptr1, const void *ptr2, size_t num) PAYLOAD_BSS;
 int (*_sx_xlock)(struct sx *sx, int opts, const char *file, int line) PAYLOAD_BSS;
