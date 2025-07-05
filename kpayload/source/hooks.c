@@ -268,6 +268,20 @@ PAYLOAD_CODE static int dlsym_wrap(struct thread *td, int module, const char *sy
   return sys_dynlib_dlsym(td, &dlsym_args);
 }
 
+PAYLOAD_CODE int klogftp(uint16_t fw_version_arg, struct configuration config_arg) {
+  fw_version = fw_version_arg;
+  fw_offsets = get_offsets_for_fw(fw_version);
+  if (!fw_offsets) {
+    return -1;
+  }
+  memcpy(&config, &config_arg, sizeof(struct configuration));
+  printf("Hello from prx: %i\n", fw_version);
+  if (config.enable_ftp) {
+      my_args.prx_path = PRX_SERVER_PATH;
+  }
+  return 0;
+}
+
 PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_prx_args *args) {
   const int r = sys_dynlib_load_prx(td, args);
   // https://github.com/OpenOrbis/mira-project/blob/d8cc5790f08f93267354c2370eb3879edba0aa98/kernel/src/Plugins/Substitute/Substitute.cpp#L1003
@@ -301,10 +315,7 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
     int handle = 0;
     if (isPartyDaemon)
     {
-     struct configuration config;
-     if (config.enable_ftp) {
-      my_args.prx_path = PRX_SERVER_PATH;
-     }
+      klogftp();
     }
     else if (isShellUI)
     {
