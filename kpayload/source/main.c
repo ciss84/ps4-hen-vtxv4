@@ -13,7 +13,7 @@
 #include "self_helper.h"
 #include "sparse.h"
 
-//#include "../../installer/include/config_struct.h"
+#include "../../installer/include/config_struct.h"
 
 uint16_t fw_version PAYLOAD_BSS = 0;
 const struct kpayload_offsets *fw_offsets PAYLOAD_BSS = NULL;
