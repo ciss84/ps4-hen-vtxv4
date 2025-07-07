@@ -14,7 +14,7 @@
 #include "sparse.h"
 
 #include "../../installer/include/config_struct.h"
-#include "../../installer/include/patch.h"
+#include "../../installer/include/path.h"
 
 uint16_t fw_version PAYLOAD_BSS = 0;
 const struct kpayload_offsets *fw_offsets PAYLOAD_BSS = NULL;
