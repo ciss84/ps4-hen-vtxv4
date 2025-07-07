@@ -339,16 +339,3 @@ PAYLOAD_CODE void install_syscall_hooks(void) {
   intr_restore(flags);
   writeCr0(cr0);
 }
-
-PAYLOAD_CODE void install_nobd_syscall_hooks(void) {
-   uint64_t flags, cr0;
-
-  cr0 = readCr0();
-  writeCr0(cr0 & ~X86_CR0_WP);
-  flags = intr_disable();
-
-  install_syscall(9, sys_jailbreak);
-
-  intr_restore(flags);
-  writeCr0(cr0);
-}
