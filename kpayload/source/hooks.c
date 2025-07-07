@@ -300,7 +300,7 @@ PAYLOAD_CODE int sys_dynlib_load_prx_hook(struct thread *td, struct dynlib_load_
     int handle = 0;
     if (isPartyDaemon)
     {
-      //my_args.prx_path = PRX_SERVER_PATH;
+      my_args.prx_path = PRX_SERVER_PATH;
     }
     else if (isShellUI)
     {
@@ -335,6 +335,19 @@ PAYLOAD_CODE void install_syscall_hooks(void) {
   if (sys_dynlib_load_prx && sys_dynlib_dlsym) {
     install_syscall(594, sys_dynlib_load_prx_hook);
   }
+
+  intr_restore(flags);
+  writeCr0(cr0);
+}
+
+PAYLOAD_CODE void install_nobd_syscall_hooks(void) {
+   uint64_t flags, cr0;
+
+  cr0 = readCr0();
+  writeCr0(cr0 & ~X86_CR0_WP);
+  flags = intr_disable();
+
+  install_syscall(9, sys_jailbreak);
 
   intr_restore(flags);
   writeCr0(cr0);
