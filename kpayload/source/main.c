@@ -14,7 +14,6 @@
 #include "sparse.h"
 
 #include "../../installer/include/config_struct.h"
-#include "../../installer/include/path.h"
 
 uint16_t fw_version PAYLOAD_BSS = 0;
 const struct kpayload_offsets *fw_offsets PAYLOAD_BSS = NULL;
@@ -365,9 +364,10 @@ PAYLOAD_CODE int my_entrypoint(uint16_t fw_version_arg, struct configuration con
     resolve_syscall();
     install_syscall_hooks();
   }
-  if (config.enable_ftp){
-    HEN_FTP;
-  }
+  /*if (config.enable_ftp){
+
+  }*/
+  
   return 0;
 }
 
