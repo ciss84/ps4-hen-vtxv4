@@ -24,10 +24,12 @@
 
 #define MATCH(n) strcmp(name, n) == 0
 
-//static 
-void upload_ver(void) {
-  write_blob(BASE_PATH "/" VERSION_TXT, VERSION, sizeof(VERSION) - 1);
+void upload_ini(void) {
   write_blob(HDD_INI_PATH, hen_ini, hen_ini_len);
+}
+
+static void upload_ver(void) {
+  write_blob(BASE_PATH "/" VERSION_TXT, VERSION, sizeof(VERSION) - 1);
 }
 
 // Helper function to set all configuration values to their defaults

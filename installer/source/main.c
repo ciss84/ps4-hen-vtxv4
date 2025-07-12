@@ -192,7 +192,7 @@ int _main(struct thread *td) {
   if (config.upload_prx) {
     printf_debug("Writing plugin PRXs and ini to disk...\n");
     upload_prx_to_disk();
-    upload_ver();
+    upload_ini();
   }
 
   if (!config.skip_patches) {
