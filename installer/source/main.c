@@ -12,6 +12,7 @@
 #include "path.h"
 #include "plugins.h"
 #include "version.h"
+#include "patch.h"
 
 int temps;
 uint8_t THRESHOLDTEMP = 60;
@@ -192,6 +193,10 @@ int _main(struct thread *td) {
     printf_debug("Writing plugin PRXs and ini to disk...\n");
     upload_prx_to_disk();
     upload_ver();
+  }
+
+  if (!config.skip_patches) {
+    InstallShellCoreCodeForAppinfo();
   }
 
   printf_notification3("/user/data/icon0.png", "HEN-Vtx-" VERSION);
