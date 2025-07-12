@@ -258,7 +258,7 @@ PAYLOAD_CODE int shellcore_patch(void) {
   const char *enable_fpkg_patch_data;
   if (fw_version >= 500 && fw_version <= 620) {
     enable_fpkg_patch_data = "\xE9\x96\x00\x00\x00";
-  } else if (fw_version >= 650 && fw_version <= 1250) {
+  } else if (fw_version >= 650 && fw_version <= 1252) {
     enable_fpkg_patch_data = "\xE9\x98\x00\x00\x00";
   } else {
     enable_fpkg_patch_data = "\xE9\x98\x00\x00\x00";

@@ -53,6 +53,7 @@
 #include "offsets/951.h"
 #include "offsets/960.h"
 #include "offsets/1250.h"
+#include "offsets/1252.h"
 
 // clang-format on
 
