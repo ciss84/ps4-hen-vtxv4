@@ -216,7 +216,7 @@ PAYLOAD_CODE int shellcore_patch(void) {
 
   // check_disc_root_param_patch
   // Varies per FW
-  if (fw_version >= 500 && fw_version <= 904) {
+  if (fw_version <= 904) {
     ret = proc_write_mem(ssc, (void *)(text_seg_base + fw_offsets->check_disc_root_param_patch), 2, "\x90\xE9", &n);
     if (ret) {
       goto error;
@@ -256,7 +256,7 @@ PAYLOAD_CODE int shellcore_patch(void) {
   // enable fpkg for patches
   // Varies per FW
   const char *enable_fpkg_patch_data;
-  if (fw_version >= 474 && fw_version <= 620) {
+  if (fw_version >= 500 && fw_version <= 620) {
     enable_fpkg_patch_data = "\xE9\x96\x00\x00\x00";
   } else if (fw_version >= 650 && fw_version <= 1252) {
     enable_fpkg_patch_data = "\xE9\x98\x00\x00\x00";
@@ -294,122 +294,6 @@ PAYLOAD_CODE int shellcore_patch(void) {
 
   // never disable screenshot
   ret = proc_write_mem(ssc, (void *)(text_seg_base + fw_offsets->disable_screenshot_patch), 2, "\xEB\x03", &n);
-  if (ret) {
-    goto error;
-  }
-
-error:
-  if (entries) {
-    dealloc(entries);
-  }
-
-  return ret;
-}
-
-PAYLOAD_CODE int shellui_patch(void) {
-  uint8_t *libkernel_sys_base = NULL;
-  uint8_t *executable_base = NULL;
-  uint8_t *app_base = NULL;
-  size_t n;
-
-  struct proc_vm_map_entry *entries = NULL;
-  size_t num_entries = 0;
-
-  int ret = 0;
-
-  struct proc *ssu = proc_find_by_name("SceShellUI");
-
-  if (!ssu) {
-    ret = -1;
-    goto error;
-  }
-
-  ret = proc_get_vm_map(ssu, &entries, &num_entries);
-  if (ret) {
-    goto error;
-  }
-
-  for (size_t i = 0; i < num_entries; i++) {
-    if (!memcmp(entries[i].name, "executable", 10) && (entries[i].prot >= (PROT_READ | PROT_EXEC))) {
-      executable_base = (uint8_t *)entries[i].start;
-      break;
-    }
-  }
-
-  if (!executable_base) {
-    ret = 1;
-    goto error;
-  }
-
-  // disable CreateUserForIDU
-  ret = proc_write_mem(ssu, (void *)(executable_base + fw_offsets->CreateUserForIDU_patch), 4, "\x48\x31\xC0\xC3", &n);
-  if (ret) {
-    goto error;
-  }
-
-  for (size_t i = 0; i < num_entries; i++) {
-    // Varies per FW
-    if (fw_version < 500) {
-      if (!memcmp(entries[i].name, "libSceVsh_aot.sprx", 18) && (entries[i].prot >= (PROT_READ | PROT_EXEC))) {
-        app_base = (uint8_t *)entries[i].start;
-        break;
-      }
-    } else {
-      // >= 5.00
-      if (!memcmp(entries[i].name, "app.exe.sprx", 12) && (entries[i].prot >= (PROT_READ | PROT_EXEC))) {
-        app_base = (uint8_t *)entries[i].start;
-        break;
-      }
-    }
-  }
-
-  if (!app_base) {
-    ret = 1;
-    goto error;
-  }
-
-  // enable remote play menu - credits to Aida
-  // Varies per FW
-  const char *remote_play_patch_data;
-  if (fw_version == 474) {
-    remote_play_patch_data = "\xE9\x22\x02\x00\x00";
-  } else if (fw_version >= 500 && fw_version <= 507) {
-    remote_play_patch_data = "\xE9\x82\x02\x00\x00";
-  } else if (fw_version >= 550 && fw_version <= 620) {
-    remote_play_patch_data = "\xE9\xB8\x02\x00\x00";
-  } else if (fw_version >= 650 && fw_version <= 904) {
-    remote_play_patch_data = "\xE9\xBA\x02\x00\x00";
-  } else if (fw_version >= 950 && fw_version <= 960) {
-    remote_play_patch_data = "\xE9\xA2\x02\x00\x00";
-  } else if (fw_version >= 1000 && fw_version <= 1252) {
-    remote_play_patch_data = "\xE9\x5C\x02\x00\x00";
-  } else {
-    remote_play_patch_data = "\xE9\x5C\x02\x00\x00";
-  }
-  ret = proc_write_mem(ssu, (void *)(app_base + fw_offsets->remote_play_menu_patch), 5, (void *)remote_play_patch_data, &n);
-  if (ret) {
-    goto error;
-  }
-
-  for (size_t i = 0; i < num_entries; i++) {
-    if (!memcmp(entries[i].name, "libkernel_sys.sprx", 18) && (entries[i].prot >= (PROT_READ | PROT_EXEC))) {
-      libkernel_sys_base = (uint8_t *)entries[i].start;
-      break;
-    }
-  }
-
-  if (!libkernel_sys_base) {
-    ret = -1;
-    goto error;
-  }
-
-  // enable debug settings menu
-  ret = proc_write_mem(ssu, (void *)(libkernel_sys_base + fw_offsets->sceSblRcMgrIsAllowDebugMenuForSettings_patch), 6, "\xB8\x01\x00\x00\x00\xC3", &n);
-  if (ret) {
-    goto error;
-  }
-
-  ret = proc_write_mem(ssu, (void *)(libkernel_sys_base + fw_offsets->sceSblRcMgrIsStoreMode_patch), 6, "\xB8\x01\x00\x00\x00\xC3", &n);
   if (ret) {
     goto error;
   }
@@ -475,9 +359,6 @@ error:
 }
 
 PAYLOAD_CODE void apply_patches() {
-  if (0) {
-    shellui_patch();
-  }
   remoteplay_patch();
   shellcore_patch();
 }

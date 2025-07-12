@@ -3,6 +3,7 @@
 
 #include "config_struct.h"
 
+int jailbreakbis();
 int install_patches();
 int install_payload(struct configuration *config);
 int exploit_fixes();
