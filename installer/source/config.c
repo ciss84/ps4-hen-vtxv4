@@ -6,67 +6,79 @@
 
 #include "config.h"
 
-#define DEFAULT_EXPLOIT_FIXES 0
+#define DEFAULT_EXPLOIT_FIXES 1
 #define DEFAULT_MMAP_PATCHES 1
 #define DEFAULT_BLOCK_UPDATES 1
 #define DEFAULT_DISABLE_ASLR 1
-#define DEFAULT_ENABLE_BROWSER 1
-#define DEFAULT_KERNEL_CLOCK 1
-#define DEFAULT_FAN 0
-#define DEFAULT_TEMP 1
 #define DEFAULT_NOBD_PATCHES 0
 #define DEFAULT_SKIP_PATCHES 0
 #define DEFAULT_UPLOAD_PRX 1
-#define DEFAULT_ENABLE_PLUGINS 0
+#define DEFAULT_ENABLE_PLUGINS 1
 
 #include "hen.ini.inc.c"
 
 #define MATCH(n) strcmp(name, n) == 0
 
-//static 
-void upload_ver(void) {
+void upload_ini(const char *path) {
+  write_blob(path, hen_ini, hen_ini_len);
+}
+
+static void upload_ver(void) {
   write_blob(BASE_PATH "/" VERSION_TXT, VERSION, sizeof(VERSION) - 1);
-  write_blob(HDD_INI_PATH, hen_ini, hen_ini_len);
 }
 
 // Helper function to set all configuration values to their defaults
 static void set_config_defaults(struct configuration *config) {
   memset(config, '\0', sizeof(*config));
+  config->config_version = DEFAULT_CONFIG_VERSION;
   config->exploit_fixes = DEFAULT_EXPLOIT_FIXES;
   config->mmap_patches = DEFAULT_MMAP_PATCHES;
   config->block_updates = DEFAULT_BLOCK_UPDATES;
   config->disable_aslr = DEFAULT_DISABLE_ASLR;
-  config->enable_browser = DEFAULT_ENABLE_BROWSER;  
-  config->kernel_clock = DEFAULT_KERNEL_CLOCK; 
-  config->fan = DEFAULT_FAN;
-  config->temp = DEFAULT_TEMP;  
   config->nobd_patches = DEFAULT_NOBD_PATCHES;
   config->upload_prx = DEFAULT_UPLOAD_PRX;
   config->enable_plugins = DEFAULT_ENABLE_PLUGINS;
   // target_id is already zeroed by memset, which means no spoofing
 }
 
-// Helper function to validate and set boolean config values (0 or 1)
+// Helper function to validate and set boolean config values (0, false, 1, or true)
 static int set_bool_config(const char *name, const char *value, int *config_field, int default_value) {
-  if (strcmp(value, "0") == 0) {
+  if (strcmp(value, "0") == 0 || strcasecmp(value, "false") == 0) {
     *config_field = 0;
     return 1;
-  } else if (strcmp(value, "1") == 0) {
+  } else if (strcmp(value, "1") == 0 || strcasecmp(value, "true") == 0) {
     *config_field = 1;
     return 1;
-  } else {
-    printf_notification("ERROR: Invalid %s:\n    Must be 0 or 1", name);
-    *config_field = default_value;
+  }
+
+  printf_notification("ERROR: Invalid %s:\n    Must be 0 or 1 (false or true)", name);
+  *config_field = default_value;
+  return 1;
+}
+
+static int set_int_config(const char *name, const char *value, int *config_field, int default_value) {
+  int parsed_v = 0;
+  if (sscanf(value, "%d", &parsed_v) == 1) {
+    *config_field = parsed_v;
     return 1;
   }
+
+  printf_notification("ERROR: Malformed %s", name);
+  *config_field = default_value;
+  return 1;
 }
+
+int found_version = 0;
 
 // The return values are flipped in this function compared to the rest of this
 // file because the INI lib expects it that way
 static int config_handler(void *config, const char *name, const char *value) {
   struct configuration *config_p = (struct configuration *)config;
 
-  if (MATCH("exploit_fixes")) {
+  if (MATCH("config_version")) {
+    found_version = 1;
+    return set_int_config("config_version", value, &config_p->config_version, DEFAULT_CONFIG_VERSION);
+  } else if (MATCH("exploit_fixes")) {
     return set_bool_config("exploit_fixes", value, &config_p->exploit_fixes, DEFAULT_EXPLOIT_FIXES);
   } else if (MATCH("mmap_patches")) {
     return set_bool_config("mmap_patches", value, &config_p->mmap_patches, DEFAULT_MMAP_PATCHES);
@@ -74,14 +86,6 @@ static int config_handler(void *config, const char *name, const char *value) {
     return set_bool_config("block_updates", value, &config_p->block_updates, DEFAULT_BLOCK_UPDATES);
   } else if (MATCH("disable_aslr")) {
     return set_bool_config("disable_aslr", value, &config_p->disable_aslr, DEFAULT_DISABLE_ASLR);
-  } else if (MATCH("enable_browser")) {
-    return set_bool_config("enable_browser", value, &config_p->enable_browser, DEFAULT_ENABLE_BROWSER); 
-  } else if (MATCH("kernel_clock")) {
-    return set_bool_config("kernel_clock", value, &config_p->kernel_clock, DEFAULT_KERNEL_CLOCK); 
-  } else if (MATCH("fan")) {
-    return set_bool_config("fan", value, &config_p->fan, DEFAULT_FAN); 
-  } else if (MATCH("temp")) {
-    return set_bool_config("temp", value, &config_p->temp, DEFAULT_TEMP); 
   } else if (MATCH("nobd_patches")) {
     return set_bool_config("nobd_patches", value, &config_p->nobd_patches, DEFAULT_NOBD_PATCHES);
   } else if (MATCH("skip_patches")) {
@@ -121,10 +125,10 @@ static int config_handler(void *config, const char *name, const char *value) {
 int init_config(struct configuration *config) {
   // Create HEN directory, if it doesn't already exist
   if (!dir_exists(BASE_PATH)) {
-    mkdir(BASE_PATH, 777);
+    mkdir(BASE_PATH, 0777);
   }
 
-  //upload_ver();
+  upload_ver();
 
   int ret = -1;
   set_config_defaults(config);

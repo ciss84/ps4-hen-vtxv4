@@ -4,6 +4,9 @@
 - Current Supports 5.05 - 12.02
 - Homebrew Enabler
 - [Plugins System](https://github.com/Scene-Collective/ps4-hen-plugins)
+  - Patches ShellUI to allow more features.
+    - Features:
+      - More details at [`plugin_mono`](https://github.com/Scene-Collective/ps4-hen-plugins/blob/main/.github/README.md#plugin_mono) page
   - Load PRX into `ScePartyDaemon`
     - (Starts kernel log server on port 3232, based on [klogsrv](https://github.com/ps5-payload-dev/klogsrv))
     - (Starts FTP server on port 2121, based on [ftpsrv](https://github.com/ps5-payload-dev/ftpsrv))
