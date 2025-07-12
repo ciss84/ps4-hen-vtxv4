@@ -528,6 +528,7 @@ int kpayload_jailbreakbis(struct thread *td, struct kpayload_firmware_args *args
   cred->cr_ruid = 0;
   cred->cr_rgid = 0;
   cred->cr_groups[0] = 0;
+
   cred->cr_prison = *prison0;
   fd->fd_rdir = fd->fd_jdir = *rootvnode;
 
