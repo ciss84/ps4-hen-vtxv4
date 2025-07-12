@@ -122,7 +122,7 @@ PAYLOAD_CODE const struct kpayload_offsets *get_offsets_for_fw(uint16_t fw_versi
   case 1250:
     return &offsets_1250;
   case 1252:
-    return &offsets_1250;         
+    return &offsets_1252;         
   default:
     return NULL;
   }
