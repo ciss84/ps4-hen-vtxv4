@@ -20,8 +20,6 @@
 #define DEFAULT_ENABLE_FTP 0
 #define DEFAULT_ENABLE_PLUGINS 1
 
-#include "hen.ini.inc.c"
-
 #define MATCH(n) strcmp(name, n) == 0
 
 //static 
