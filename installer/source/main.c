@@ -145,7 +145,10 @@ int _main(struct thread *td) {
   install_patches();
   initSysUtil();
   writeCacheImg();
-  
+
+  if (!file_exists(HDD_INI_PATH)) {
+    upload_ini(HDD_INI_PATH);
+  } 
   // Initialize config
   struct configuration config;
   init_config(&config);

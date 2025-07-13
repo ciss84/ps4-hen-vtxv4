@@ -10,8 +10,8 @@ void write_blob(const char *path, const void *blob, const size_t blobsz) {
     printf_notification("Invalid parameters for write_blob");
     return;
   }
-  if (!file_exists(HDD_INI_PATH)) {
-    upload_ini(HDD_INI_PATH);
+  if (file_exists(path)) {
+    unlink(path);
   }
   int fd = open(path, O_CREAT | O_RDWR, 0777);
   printf_debug("fd %s %d\n", path, fd);
