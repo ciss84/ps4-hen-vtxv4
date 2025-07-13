@@ -24,27 +24,27 @@ typedef struct SceKernelAioRWRequest {
 static int32* id_state;
 static int32 id_index;
 
-extern int (*sceKernelAioInitializeImpl)(void* p, extern int size);
-extern int (*sceKernelAioDeleteRequest)(SceKernelAioSubmitId id, extern int* ret);
-extern int (*sceKernelAioDeleteRequests)(SceKernelAioSubmitId id[], extern int num, extern int ret[]);
+extern int (*sceKernelAioInitializeImpl)(void* p, int size);
+extern int (*sceKernelAioDeleteRequest)(SceKernelAioSubmitId id, int* ret);
+extern int (*sceKernelAioDeleteRequests)(SceKernelAioSubmitId id[], int num, int ret[]);
 
-extern int (*sceKernelAioPollRequest)(SceKernelAioSubmitId id, extern int* state);
-extern int (*sceKernelAioPollRequests)(SceKernelAioSubmitId id[], extern int num, extern int state[]);
+extern int (*sceKernelAioPollRequest)(SceKernelAioSubmitId id, int* state);
+extern int (*sceKernelAioPollRequests)(SceKernelAioSubmitId id[], int num, int state[]);
 
-extern int (*sceKernelAioCancelRequest)(SceKernelAioSubmitId id, extern int* state);
+extern int (*sceKernelAioCancelRequest)(SceKernelAioSubmitId id, int* state);
 
-extern int (*sceKernelAioCancelRequests)(SceKernelAioSubmitId id[], extern int num, extern int state[]);
+extern int (*sceKernelAioCancelRequests)(SceKernelAioSubmitId id[], int num, int state[]);
 
-extern int (*sceKernelAioWaitRequest)(SceKernelAioSubmitId id, extern int* state, uint32* usec);
-extern int (*sceKernelAioWaitRequests)(SceKernelAioSubmitId id[], extern int num, extern int state[], uint32 mode, uint32* usec);
+extern int (*sceKernelAioWaitRequest)(SceKernelAioSubmitId id, int* state, uint32* usec);
+extern int (*sceKernelAioWaitRequests)(SceKernelAioSubmitId id[], int num, int state[], uint32 mode, uint32* usec);
 
-extern int (*sceKernelAioSubmitReadCommands)(SceKernelAioRWRequest req[], extern int size, extern int prio, SceKernelAioSubmitId* id);
+extern int (*sceKernelAioSubmitReadCommands)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId* id);
 
-extern int (*sceKernelAioSubmitReadCommandsMultiple)(SceKernelAioRWRequest req[], extern int size, extern int prio, SceKernelAioSubmitId id[]);
+extern int (*sceKernelAioSubmitReadCommandsMultiple)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId id[]);
 
-extern int (*sceKernelAioSubmitWriteCommands)(SceKernelAioRWRequest req[], extern int size, extern int prio, SceKernelAioSubmitId* id);
+extern int (*sceKernelAioSubmitWriteCommands)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId* id);
 
-extern int (*sceKernelAioSubmitWriteCommandsMultiple)(SceKernelAioRWRequest req[], extern int size, extern int prio, SceKernelAioSubmitId id[]);
+extern int (*sceKernelAioSubmitWriteCommandsMultiple)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId id[]);
 
 void initaiofix(void);
 
