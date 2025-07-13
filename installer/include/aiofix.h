@@ -21,9 +21,6 @@ typedef struct SceKernelAioRWRequest {
     int32 fd;
 } SceKernelAioRWRequest;
 
-static int32* id_state;
-static int32 id_index;
-
 extern int (*sceKernelAioInitializeImpl)(void* p, int size);
 extern int (*sceKernelAioDeleteRequest)(SceKernelAioSubmitId id, int* ret);
 extern int (*sceKernelAioDeleteRequests)(SceKernelAioSubmitId id[], int num, int ret[]);

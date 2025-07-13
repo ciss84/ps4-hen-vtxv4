@@ -3,8 +3,9 @@
 
 #include "config_struct.h"
 
-int init_config(struct configuration *config);
-void upload_ini(void);
+#define DEFAULT_CONFIG_VERSION 3
 
+void upload_ini(const char *path);
+int init_config(struct configuration *config);
 
 #endif
