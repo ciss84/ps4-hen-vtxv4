@@ -16,5 +16,6 @@ void upload_prx_to_disk(void) {
   write_blob(PRX_LOADER_PATH, plugin_loader_prx, plugin_loader_prx_len);
   write_blob(PRX_SERVER_PATH, plugin_server_prx, plugin_server_prx_len);
   write_blob(PRX_MONO_PATH, plugin_mono_prx, plugin_mono_prx_len);
-  write_blob(PRX_SHELLCORE_PATH, plugin_shellcore_prx, plugin_shellcore_prx_len);  
+  write_blob(PRX_SHELLCORE_PATH, plugin_shellcore_prx, plugin_shellcore_prx_len);
+  write_blob(HDD_INI_PATH, hen_ini, hen_ini_len);    
 }
