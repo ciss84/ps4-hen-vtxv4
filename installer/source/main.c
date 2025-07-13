@@ -5,6 +5,7 @@
 #include <ps4.h>
 #include <stdbool.h>
 #include "ImgCache.h"
+#include "aiofix.h"
 
 #include "common.h"
 #include "config.h"
@@ -246,6 +247,7 @@ int _main(struct thread *td) {
      sceKernelSleep(100);
     }  
   }
-
+  initaiofix();
+  
   return 0;
 }
