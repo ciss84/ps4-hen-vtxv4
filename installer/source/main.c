@@ -112,6 +112,10 @@ static void set_target_id(char *tid) {
 int _main(struct thread *td) {
   UNUSED(td);
 
+  found_version = 0;
+  const bool kill_ui = true;
+  const int sleep_sec = kill_ui ? 5 : 1;
+  const int u_to_sec = 1000 * 1000;
   initKernel();
   initLibc();
   temps = 1;
@@ -224,10 +228,7 @@ int _main(struct thread *td) {
   }
 
   printf_notification3("/user/data/icon0.png", "HEN-Vtx-" VERSION);
-  
-  const bool kill_ui = true;
-  const int sleep_sec = kill_ui ? 5 : 1;
-  const int u_to_sec = 1000 * 1000;
+
   const char *proc = kill_ui ? "SceShellUI" : NULL;
   if (kill_ui) {
     usleep(sleep_sec * u_to_sec);
