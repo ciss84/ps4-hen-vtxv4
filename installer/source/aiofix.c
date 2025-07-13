@@ -14,8 +14,8 @@ int (*sceKernelAioCancelRequest)(SceKernelAioSubmitId id, int* state);
 
 int (*sceKernelAioCancelRequests)(SceKernelAioSubmitId id[], int num, int state[]);
 
-int (*sceKernelAioWaitRequest)(SceKernelAioSubmitId id, int* state, u32* usec);
-int (*sceKernelAioWaitRequests)(SceKernelAioSubmitId id[], int num, int state[], u32 mode, u32* usec);
+int (*sceKernelAioWaitRequest)(SceKernelAioSubmitId id, int* state, uint32* usec);
+int (*sceKernelAioWaitRequests)(SceKernelAioSubmitId id[], int num, int state[], uint32 mode, uint32* usec);
 
 int (*sceKernelAioSubmitReadCommands)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId* id);
 

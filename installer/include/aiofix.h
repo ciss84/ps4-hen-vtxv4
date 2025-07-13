@@ -7,22 +7,22 @@
 #include "kernel.h"
 
 typedef struct SceKernelAioResult {
-    extern int64 returnValue;
-    uextern int32 state;
+    int64 returnValue;
+    int32 state;
 } SceKernelAioResult;
 
 typedef extern int32 SceKernelAioSubmitId;
 
 typedef struct SceKernelAioRWRequest {
     off_t offset;
-    extern int64 nbyte;
+    int64 nbyte;
     void* buf;
     struct SceKernelAioResult* result;
-    extern int32 fd;
+    int32 fd;
 } SceKernelAioRWRequest;
 
-static extern int32* id_state;
-static extern int32 id_index;
+static int32* id_state;
+static int32 id_index;
 
 extern int (*sceKernelAioInitializeImpl)(void* p, extern int size);
 extern int (*sceKernelAioDeleteRequest)(SceKernelAioSubmitId id, extern int* ret);
@@ -35,8 +35,8 @@ extern int (*sceKernelAioCancelRequest)(SceKernelAioSubmitId id, extern int* sta
 
 extern int (*sceKernelAioCancelRequests)(SceKernelAioSubmitId id[], extern int num, extern int state[]);
 
-extern int (*sceKernelAioWaitRequest)(SceKernelAioSubmitId id, extern int* state, u32* usec);
-extern int (*sceKernelAioWaitRequests)(SceKernelAioSubmitId id[], extern int num, extern int state[], u32 mode, u32* usec);
+extern int (*sceKernelAioWaitRequest)(SceKernelAioSubmitId id, extern int* state, uint32* usec);
+extern int (*sceKernelAioWaitRequests)(SceKernelAioSubmitId id[], extern int num, extern int state[], uint32 mode, uint32* usec);
 
 extern int (*sceKernelAioSubmitReadCommands)(SceKernelAioRWRequest req[], extern int size, extern int prio, SceKernelAioSubmitId* id);
 
