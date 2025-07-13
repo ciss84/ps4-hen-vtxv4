@@ -2,10 +2,7 @@
 #include "syscall.h"
 
 #include "aiofix.h"
-
-int libKernelHandle;
-
-int *(*__error)();
+#include "kernel.h"
 
 int (*sceKernelAioInitializeImpl)(void* p, int size);
 int (*sceKernelAioDeleteRequest)(SceKernelAioSubmitId id, int* ret);
