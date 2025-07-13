@@ -1,9 +1,10 @@
 #pragma once
 
-#ifndef KERNEL_H
-#define KERNEL_H
+#ifndef AIO_H
+#define AIO_H
 
 #include "types.h"
+#include "kernel.h"
 
 typedef struct SceKernelAioResult {
     int64 returnValue;
