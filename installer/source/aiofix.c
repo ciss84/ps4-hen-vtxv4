@@ -5,6 +5,8 @@
 
 int libKernelHandle;
 
+int *(*__error)();
+
 int (*sceKernelAioInitializeImpl)(void* p, int size);
 int (*sceKernelAioDeleteRequest)(SceKernelAioSubmitId id, int* ret);
 int (*sceKernelAioDeleteRequests)(SceKernelAioSubmitId id[], int num, int ret[]);
