@@ -146,36 +146,9 @@ int _main(struct thread *td) {
   initSysUtil();
   writeCacheImg();
 
-  if (!file_exists(HDD_INI_PATH)) {
-    upload_ini(HDD_INI_PATH);
-  } 
   // Initialize config
   struct configuration config;
   init_config(&config);
-
-  const bool ver_match = config.config_version != DEFAULT_CONFIG_VERSION;
-  const bool found_ver = found_version == 0;
-  if (file_exists(HDD_INI_PATH) && (ver_match || found_ver)) {
-    const char *reason = " unknown!";
-    if (ver_match) {
-      reason = " out of date!";
-    } else if (found_ver) {
-      reason = " not found!";
-    }
-    printf_debug("config version not match\n");
-    printf_debug("config.config_version: %d\n", config.config_version);
-    printf_debug("found_version: %d\n", found_version);
-    upload_ini(HDD_INI_PATH);
-    bool found_usb = file_exists(USB_INI_PATH) == 1;
-    if (found_usb) {
-      upload_ini(USB_INI_PATH);
-    }
-    printf_notification("Config version (%d/%d)%s\n"
-                        "Updating settings file on %s%s...", config.config_version, DEFAULT_CONFIG_VERSION, reason, "HDD", found_usb ? " and USB" : "");
-    init_config(&config);
-    // sleep so user can see welcome message before shellui restarts
-    usleep(sleep_sec * u_to_sec);
-  }
 
   if (config.exploit_fixes) {
     printf_debug("Applying exploit fixes...\n");
