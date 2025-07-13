@@ -112,7 +112,6 @@ static void set_target_id(char *tid) {
 int _main(struct thread *td) {
   UNUSED(td);
 
-  found_version = 0;
   const bool kill_ui = true;
   const int sleep_sec = kill_ui ? 5 : 1;
   const int u_to_sec = 1000 * 1000;
