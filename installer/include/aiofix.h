@@ -11,7 +11,7 @@ typedef struct SceKernelAioResult {
     int32 state;
 } SceKernelAioResult;
 
-typedef extern int32 SceKernelAioSubmitId;
+typedef int32 SceKernelAioSubmitId;
 
 typedef struct SceKernelAioRWRequest {
     off_t offset;
