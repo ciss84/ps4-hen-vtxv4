@@ -110,7 +110,7 @@ int _main(struct thread *td) {
   }
 
   // Jailbreak the process
-  jailbreak();
+  jailbreakbis();
 
   // Use temp file to prevent re-running HEN
   if (file_exists(IS_INSTALLED_PATH)) {
@@ -193,12 +193,12 @@ int _main(struct thread *td) {
     InstallShellCoreCodeForAppinfo();
   }
 
-  printf_notification("Welcome to HEN %s", VERSION);
+  printf_notification3("/user/data/icon0.png", "HEN-Vtx-" VERSION);
 
   const char *proc = kill_ui ? "SceShellUI" : NULL;
   if (kill_ui) {
     usleep(sleep_sec * u_to_sec);
-    printf_notification("HEN will restart %s\nin %d seconds...", proc, sleep_sec);
+    printf_notification3("/user/data/icon0.png", "HEN will restart %s\nin %d seconds...", proc, sleep_sec);
   }
 
 #ifdef DEBUG_SOCKET
