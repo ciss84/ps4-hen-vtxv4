@@ -35,7 +35,7 @@ fi
 if [ "$SKIP_DOWNLOAD" = false ]; then
   f="plugins.zip"
   rm -f $f
-  curl -fLJO https://github.com/ciss84/ps4-hen-plugins/releases/download/b170/plugins.zip
+  curl -fLJO https://github.com/ciss84/ps4-hen-plugins/releases/download/b182/plugins.zip
   unzip $f
 fi
 
