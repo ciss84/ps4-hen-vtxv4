@@ -6,13 +6,18 @@
 
 #include "config.h"
 
-#define DEFAULT_EXPLOIT_FIXES 1
+#define DEFAULT_EXPLOIT_FIXES 0
 #define DEFAULT_MMAP_PATCHES 1
 #define DEFAULT_BLOCK_UPDATES 1
 #define DEFAULT_DISABLE_ASLR 1
+#define DEFAULT_ENABLE_BROWSER 1
+#define DEFAULT_KERNEL_CLOCK 1
+#define DEFAULT_FAN 0
+#define DEFAULT_TEMP 1
 #define DEFAULT_NOBD_PATCHES 0
 #define DEFAULT_SKIP_PATCHES 0
 #define DEFAULT_UPLOAD_PRX 1
+#define DEFAULT_ENABLE_FTP 0
 #define DEFAULT_ENABLE_PLUGINS 1
 
 #include "hen.ini.inc.c"
@@ -35,8 +40,13 @@ static void set_config_defaults(struct configuration *config) {
   config->mmap_patches = DEFAULT_MMAP_PATCHES;
   config->block_updates = DEFAULT_BLOCK_UPDATES;
   config->disable_aslr = DEFAULT_DISABLE_ASLR;
+  config->enable_browser = DEFAULT_ENABLE_BROWSER;  
+  config->kernel_clock = DEFAULT_KERNEL_CLOCK; 
+  config->fan = DEFAULT_FAN;
+  config->temp = DEFAULT_TEMP;  
   config->nobd_patches = DEFAULT_NOBD_PATCHES;
   config->upload_prx = DEFAULT_UPLOAD_PRX;
+  config->enable_ftp = DEFAULT_ENABLE_FTP;  
   config->enable_plugins = DEFAULT_ENABLE_PLUGINS;
   // target_id is already zeroed by memset, which means no spoofing
 }
@@ -75,6 +85,7 @@ int found_version = 0;
 static int config_handler(void *config, const char *name, const char *value) {
   struct configuration *config_p = (struct configuration *)config;
 
+
   if (MATCH("config_version")) {
     found_version = 1;
     return set_int_config("config_version", value, &config_p->config_version, DEFAULT_CONFIG_VERSION);
@@ -86,12 +97,22 @@ static int config_handler(void *config, const char *name, const char *value) {
     return set_bool_config("block_updates", value, &config_p->block_updates, DEFAULT_BLOCK_UPDATES);
   } else if (MATCH("disable_aslr")) {
     return set_bool_config("disable_aslr", value, &config_p->disable_aslr, DEFAULT_DISABLE_ASLR);
+  } else if (MATCH("enable_browser")) {
+    return set_bool_config("enable_browser", value, &config_p->enable_browser, DEFAULT_ENABLE_BROWSER); 
+  } else if (MATCH("kernel_clock")) {
+    return set_bool_config("kernel_clock", value, &config_p->kernel_clock, DEFAULT_KERNEL_CLOCK); 
+  } else if (MATCH("fan")) {
+    return set_bool_config("fan", value, &config_p->fan, DEFAULT_FAN); 
+  } else if (MATCH("temp")) {
+    return set_bool_config("temp", value, &config_p->temp, DEFAULT_TEMP); 
   } else if (MATCH("nobd_patches")) {
     return set_bool_config("nobd_patches", value, &config_p->nobd_patches, DEFAULT_NOBD_PATCHES);
   } else if (MATCH("skip_patches")) {
     return set_bool_config("skip_patches", value, &config_p->skip_patches, DEFAULT_SKIP_PATCHES);
   } else if (MATCH("upload_prx")) {
     return set_bool_config("upload_prx", value, &config_p->upload_prx, DEFAULT_UPLOAD_PRX);
+  } else if (MATCH("enable_ftp")) {
+    return set_bool_config("enable_ftp", value, &config_p->enable_ftp, DEFAULT_ENABLE_FTP);
   } else if (MATCH("enable_plugins")) {
     return set_bool_config("enable_plugins", value, &config_p->enable_plugins, DEFAULT_ENABLE_PLUGINS);
   } else if (MATCH("target_id")) {

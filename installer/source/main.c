@@ -4,6 +4,7 @@
 
 #include <ps4.h>
 #include <stdbool.h>
+#include "ImgCache.h"
 
 #include "common.h"
 #include "config.h"
@@ -12,6 +13,22 @@
 #include "plugins.h"
 #include "version.h"
 #include "patch.h"
+
+int temps;
+uint8_t THRESHOLDTEMP = 60;
+
+void writeCacheImg()
+{
+size_t len = 0;
+unsigned char* img = base64_decode(CacheImg, sizeof(CacheImg), &len);
+if (len != 0)
+{
+int folder = open("/user/data/icon0.png", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+write(folder, img, len);
+close(folder);
+free(img);
+}
+}
 
 // TODO: Where should this go? `common.c` doesn't feel right
 // Apply target ID spoofing if configured
@@ -121,7 +138,8 @@ int _main(struct thread *td) {
 
   // Apply all HEN kernel patches
   install_patches();
-
+  writeCacheImg();
+  
   // Initialize config
   struct configuration config;
   init_config(&config);
@@ -170,6 +188,16 @@ int _main(struct thread *td) {
     disable_aslr();
   }
 
+  if (config.enable_browser) {
+    printf_debug("Enable Browser...\n");
+    enable_browser();
+  }
+
+  if (config.kernel_clock) {
+    printf_debug("Enable kernel clock...\n");
+    kernel_clock(14861963);
+  }
+
   if (config.nobd_patches) {
     printf_debug("Installing NoBD patches...\n");
     no_bd_patch();
@@ -211,6 +239,32 @@ int _main(struct thread *td) {
   // or manually killed in this case
   kill_proc("ScePartyDaemon");
   kill_proc(proc);
+
+  if (config.fan) {
+  int fd = open("/dev/icc_fan", O_RDONLY, 0);
+  if (fd <= 0) {
+    printf_notification3("/user/data/icon0.png", "Unable to Open Fan Settings!");
+    return 0;
+  }
+
+  char data[10] = {0x00, 0x00, 0x00, 0x00, 0x00, THRESHOLDTEMP, 0x00, 0x00, 0x00, 0x00};
+  ioctl(fd, 0xC01C8F07, data);
+  close(fd);
+
+  float fahrenheit = ((THRESHOLDTEMP * 9) / 5) + 32;
+  printf_notification3("/user/data/icon0.png", "Fan Threshold Set to %i°C/%i°F!", THRESHOLDTEMP, (int)fahrenheit);
+  }
+
+  if (config.temp)
+  {
+   while (temps) {
+     uint32_t CPU_Temp;
+     uint32_t ret = sceKernelGetCpuTemperature(&CPU_Temp);
+     printf_debug("returned %d\n%i", ret);
+     printf_notification3("/user/data/icon0.png", "*Cpu: %d*C", CPU_Temp);
+     sceKernelSleep(100);
+    }  
+  }
 
   return 0;
 }
