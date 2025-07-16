@@ -45,8 +45,7 @@ static void set_config_defaults(struct configuration *config) {
   config->fan = DEFAULT_FAN;
   config->temp = DEFAULT_TEMP;  
   config->nobd_patches = DEFAULT_NOBD_PATCHES;
-  config->upload_prx = DEFAULT_UPLOAD_PRX;
-  config->enable_ftp = DEFAULT_ENABLE_FTP;  
+  config->upload_prx = DEFAULT_UPLOAD_PRX; 
   config->enable_plugins = DEFAULT_ENABLE_PLUGINS;
   // target_id is already zeroed by memset, which means no spoofing
 }
@@ -111,8 +110,6 @@ static int config_handler(void *config, const char *name, const char *value) {
     return set_bool_config("skip_patches", value, &config_p->skip_patches, DEFAULT_SKIP_PATCHES);
   } else if (MATCH("upload_prx")) {
     return set_bool_config("upload_prx", value, &config_p->upload_prx, DEFAULT_UPLOAD_PRX);
-  } else if (MATCH("enable_ftp")) {
-    return set_bool_config("enable_ftp", value, &config_p->enable_ftp, DEFAULT_ENABLE_FTP);
   } else if (MATCH("enable_plugins")) {
     return set_bool_config("enable_plugins", value, &config_p->enable_plugins, DEFAULT_ENABLE_PLUGINS);
   } else if (MATCH("target_id")) {
