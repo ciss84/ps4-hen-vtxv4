@@ -5,7 +5,6 @@
 
 // will force rebuild because its translation unit to be built first
 // static won't redefine these symbols here
-#include "hen.ini.inc.c"
 #include "plugin_bootloader.prx.inc.c"
 #include "plugin_loader.prx.inc.c"
 #include "plugin_server.prx.inc.c"
@@ -13,10 +12,9 @@
 #include "plugin_shellcore.prx.inc.c"
 
 void upload_prx_to_disk(void) {
-  write_blob(HDD_INI_PATH, hen_ini, hen_ini_len);
   write_blob(PRX_BOOTLOADER_PATH, plugin_bootloader_prx, plugin_bootloader_prx_len);
   write_blob(PRX_LOADER_PATH, plugin_loader_prx, plugin_loader_prx_len);
   write_blob(PRX_SERVER_PATH, plugin_server_prx, plugin_server_prx_len);
   write_blob(PRX_MONO_PATH, plugin_mono_prx, plugin_mono_prx_len);
-  write_blob(PRX_SHELLCORE_PATH, plugin_shellcore_prx, plugin_shellcore_prx_len);    
+  write_blob(PRX_SHELLCORE_PATH, plugin_shellcore_prx, plugin_shellcore_prx_len);
 }

@@ -93,6 +93,7 @@ int (*sys_dynlib_dlsym)(void *param_1, void *param_2) PAYLOAD_BSS;
 extern void install_fself_hooks(void) PAYLOAD_CODE;
 extern void install_fpkg_hooks(void) PAYLOAD_CODE;
 extern void install_patches(void) PAYLOAD_CODE;
+extern void install_nobd_syscall_hooks(void) PAYLOAD_CODE;
 extern void install_syscall_hooks(void) PAYLOAD_CODE;
 extern void *get_syscall(uint64_t n) PAYLOAD_CODE;
 
@@ -358,16 +359,16 @@ PAYLOAD_CODE int my_entrypoint(uint16_t fw_version_arg, struct configuration con
   install_fpkg_hooks();
   if (!config.skip_patches) {
     install_patches();
-  } 
+  }
   if (config.enable_plugins) {
     resolve_patterns();
     resolve_syscall();
     install_syscall_hooks();
   }
-  /*if (config.enable_ftp){
+  if (config.nobd_patches) {
+    install_nobd_syscall_hooks();
+  }
 
-  }*/
-  
   return 0;
 }
 

@@ -3,7 +3,11 @@
 
 #include "config_struct.h"
 
+#define DEFAULT_CONFIG_VERSION 3
+
+void upload_ini(const char *path);
 int init_config(struct configuration *config);
-void upload_ver(void);
+
+extern int found_version;
 
 #endif

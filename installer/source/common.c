@@ -10,6 +10,7 @@ void write_blob(const char *path, const void *blob, const size_t blobsz) {
     printf_notification("Invalid parameters for write_blob");
     return;
   }
+
   if (file_exists(path)) {
     unlink(path);
   }
