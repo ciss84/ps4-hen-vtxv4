@@ -107,6 +107,23 @@ static void set_target_id(char *tid) {
 
 int _main(struct thread *td) {
   UNUSED(td);
+typedef struct SceKernelAioResult {
+    int64_t returnValue;
+    uint32_t state;
+} SceKernelAioResult;
+
+typedef int32_t SceKernelAioSubmitId;
+
+typedef struct SceKernelAioRWRequest {
+    off_t offset;
+    int64_t nbyte;
+    void* buf;
+    struct SceKernelAioResult* result;
+    int32_t fd;
+} SceKernelAioRWRequest;
+
+static int32_t* id_state;
+static int32_t id_index;
 
     static int (*sceKernelAioInitializeImpl)(void* p, int size);
     static int (*sceKernelAioDeleteRequest)(SceKernelAioSubmitId id, int* ret);
