@@ -112,14 +112,14 @@ typedef struct SceKernelAioResult {
     uint32_t state;
 } SceKernelAioResult;
 
-typedef int32_t SceKernelAioSubmitId;
+typedef int SceKernelAioSubmitId;
 
 typedef struct SceKernelAioRWRequest {
     off_t offset;
-    int64_t nbyte;
+    size_t nbyte;
     void* buf;
     struct SceKernelAioResult* result;
-    int32_t fd;
+    int fd;
 } SceKernelAioRWRequest;
 
 static int32_t* id_state;
@@ -134,10 +134,10 @@ static int32_t id_index;
     static int (*sceKernelAioCancelRequests)(SceKernelAioSubmitId id[], int num, int state[]);
     static int (*sceKernelAioWaitRequest)(SceKernelAioSubmitId id, int* state, uint32_t* usec);
     static int (*sceKernelAioWaitRequests)(SceKernelAioSubmitId id[], int num, int state[], uint32_t mode, uint32_t* usec);
-    static int (*sceKernelAioSubmitReadCommands)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId* id);
-    static int (*sceKernelAioSubmitReadCommandsMultiple)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId id[]);
-    static int (*sceKernelAioSubmitWriteCommands)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId* id);
-    static int (*sceKernelAioSubmitWriteCommandsMultiple)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId id[]);
+    static int (*sceKernelAioSubmitReadCommands)(SceKernelAioRWRequest req[], size_t size, int prio, SceKernelAioSubmitId* id);
+    static int (*sceKernelAioSubmitReadCommandsMultiple)(SceKernelAioRWRequest req[], size_t size, int prio, SceKernelAioSubmitId id[]);
+    static int (*sceKernelAioSubmitWriteCommands)(SceKernelAioRWRequest req[], size_t size, int prio, SceKernelAioSubmitId* id);
+    static int (*sceKernelAioSubmitWriteCommandsMultiple)(SceKernelAioRWRequest req[], size_t size, int prio, SceKernelAioSubmitId id[]);
 
   found_version = 0;
   const bool kill_ui = true;
