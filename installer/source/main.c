@@ -108,12 +108,42 @@ static void set_target_id(char *tid) {
 int _main(struct thread *td) {
   UNUSED(td);
 
+    static int (*sceKernelAioInitializeImpl)(void* p, int size);
+    static int (*sceKernelAioDeleteRequest)(SceKernelAioSubmitId id, int* ret);
+    static int (*sceKernelAioDeleteRequests)(SceKernelAioSubmitId id[], int num, int ret[]);
+    static int (*sceKernelAioPollRequest)(SceKernelAioSubmitId id, int* state);
+    static int (*sceKernelAioPollRequests)(SceKernelAioSubmitId id[], int num, int state[]);
+    static int (*sceKernelAioCancelRequest)(SceKernelAioSubmitId id, int* state);
+    static int (*sceKernelAioCancelRequests)(SceKernelAioSubmitId id[], int num, int state[]);
+    static int (*sceKernelAioWaitRequest)(SceKernelAioSubmitId id, int* state, uint32_t* usec);
+    static int (*sceKernelAioWaitRequests)(SceKernelAioSubmitId id[], int num, int state[], uint32_t mode, uint32_t* usec);
+    static int (*sceKernelAioSubmitReadCommands)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId* id);
+    static int (*sceKernelAioSubmitReadCommandsMultiple)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId id[]);
+    static int (*sceKernelAioSubmitWriteCommands)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId* id);
+    static int (*sceKernelAioSubmitWriteCommandsMultiple)(SceKernelAioRWRequest req[], int size, int prio, SceKernelAioSubmitId id[]);
+
   found_version = 0;
   const bool kill_ui = true;
   const int sleep_sec = kill_ui ? 5 : 1;
   const int u_to_sec = 1000 * 1000;
   initKernel();
   initLibc();
+
+    // Load and resolve libkernel_sys library
+    int libk = sceKernelLoadStartModule("libkernel_sys.sprx", 0, NULL, 0, 0, 0);
+    RESOLVE(libk, sceKernelAioInitializeImpl);
+    RESOLVE(libk, sceKernelAioDeleteRequest);
+    RESOLVE(libk, sceKernelAioDeleteRequests);
+    RESOLVE(libk, sceKernelAioPollRequest);
+    RESOLVE(libk, sceKernelAioPollRequests);
+    RESOLVE(libk, sceKernelAioCancelRequest);
+    RESOLVE(libk, sceKernelAioCancelRequests);
+    RESOLVE(libk, sceKernelAioWaitRequest);
+    RESOLVE(libk, sceKernelAioWaitRequests);
+    RESOLVE(libk, sceKernelAioSubmitReadCommands);
+    RESOLVE(libk, sceKernelAioSubmitReadCommandsMultiple);
+    RESOLVE(libk, sceKernelAioSubmitWriteCommands);
+    RESOLVE(libk, sceKernelAioSubmitWriteCommandsMultiple);
 
 #ifdef DEBUG_SOCKET
   initNetwork();
